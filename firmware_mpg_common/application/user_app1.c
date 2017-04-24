@@ -140,28 +140,34 @@ static void UserApp1SM_Idle(void)
   static u32 u32Counter=0;
   static bool bHeartbeat=TRUE;
   static u32 u32Counter_2s=0;
-  u32 u32rate=480;
+  static bool brate;
+  static u32 u32rate=480;
   
   u32Counter++;
   u32Counter_2s++;
-  
-  if(u32Counter==2000)
+  //count two second to change the rate
+  if(u32Counter_2s==2000)
   {
-    if
-  
-  
-  
-  
-  
-  
-  
+    u32Counter_2s=0;
+    u32Counter=0;
+    //decide speed up or speed cut
+    if(u32rate>=480)
+      brate=TRUE;
+    if(u32rate<=14)
+      brate=FALSE;
+    if(brate)
+      u32rate=u32rate/2;
+    else
+      u32rate=u32rate*2;
+  }
+  //decide the HEARTBEAT ON or OFF  
   if(u32Counter==u32rate)
   {
     u32Counter=0;
     if(bHeartbeat)
     {
       HEARTBEAT_ON();
-      bHeartbeat=FALSE;                                                                                       bHeartbeat=FALSE;
+      bHeartbeat=FALSE;                                                                                       
     }
     else
     {
