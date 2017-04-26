@@ -137,44 +137,39 @@ State Machine Function Definitions
 /* Wait for ??? */
 static void UserApp1SM_Idle(void)
 {
-  static u32 u32Counter=0;
-  static bool bHeartbeat=TRUE;
-  static u32 u32Counter_2s=0;
-  static bool brate;
-  static u32 u32rate=480;
+  static u8 u8Counter_ON=0;
+  static u8 u8Counter_OFF=0;
+  static u8 u8Counter_100ms=0;
+  static u8 u8OFF_TIME=10;
+  static bool bontime=FALSE;
   
-  u32Counter++;
-  u32Counter_2s++;
-  //count two second to change the rate
-  if(u32Counter_2s==2000)
+  u8Counter_ON++;
+  u8Counter_OFF++;
+  u8Counter_100ms++;
+  
+  if(u8Counter_100ms=100)
   {
-    u32Counter_2s=0;
-    u32Counter=0;
-    //decide speed up or speed cut
-    if(u32rate>=480)
-      brate=TRUE;
-    if(u32rate<=14)
-      brate=FALSE;
-    if(brate)
-      u32rate=u32rate/2;
+    u8Counter_100ms=0;
+    u8Counter_OFF=0;
+    if(u8OFF_TIME>9)
+      bontime=TRUE;
+    if(u8OFF_TIME<2)
+      bontime=FALSE;
+    if(bontime)
+      u8OFF_TIME=u8OFF_TIME-1;
     else
-      u32rate=u32rate*2;
+      u8OFF_TIME=u8OFF_TIME+1;
   }
-  //decide the HEARTBEAT ON or OFF  
-  if(u32Counter==u32rate)
+  
+  if(u8Counter_ON=10)
   {
-    u32Counter=0;
-    if(bHeartbeat)
-    {
-      HEARTBEAT_ON();
-      bHeartbeat=FALSE;                                                                                       
-    }
-    else
-    {
-      HEARTBEAT_OFF();
-      bHeartbeat=TRUE;
-    }
-    
+    u8Counter_ON=0;
+    HEARTBEAT_ON();
+  }
+  if(u8Counter_OFF=u8OFF_TIME)
+  {
+    u8Counter_OFF=0;
+    HEARTBEAT_OFF();
   }
   
 } /* end UserApp1SM_Idle() */
