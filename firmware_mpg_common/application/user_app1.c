@@ -137,38 +137,39 @@ State Machine Function Definitions
 /* Wait for ??? */
 static void UserApp1SM_Idle(void)
 {
-  static u8 u8Counter_ON=0;
-  static u8 u8Counter_OFF=0;
-  static u8 u8Counter_100ms=0;
-  static u8 u8OFF_TIME=10;
+  static u32 u32Counter_ON=0;
+  static u32 u32Counter_OFF=0;
+  static u32 u32Counter_100ms=0;
+  static u32 u32OFF_TIME=10;
   static bool bontime=FALSE;
   
-  u8Counter_ON++;
-  u8Counter_OFF++;
-  u8Counter_100ms++;
+  u32Counter_ON++;
+  u32Counter_OFF++;
+  u32Counter_100ms++;
   
-  if(u8Counter_100ms=100)
+  if(u32Counter_100ms==100)
   {
-    u8Counter_100ms=0;
-    u8Counter_OFF=0;
-    if(u8OFF_TIME>9)
+    u32Counter_100ms=0;
+    u32Counter_OFF=0;
+    u32Counter_ON=0;
+    if(u32OFF_TIME>9)
       bontime=TRUE;
-    if(u8OFF_TIME<2)
+    if(u32OFF_TIME<2)
       bontime=FALSE;
     if(bontime)
-      u8OFF_TIME=u8OFF_TIME-1;
+      u32OFF_TIME=u32OFF_TIME-1;
     else
-      u8OFF_TIME=u8OFF_TIME+1;
+      u32OFF_TIME=u32OFF_TIME+1;
   }
   
-  if(u8Counter_ON=10)
+  if(u32Counter_ON==10)
   {
-    u8Counter_ON=0;
+    u32Counter_ON=0;
+    u32Counter_OFF=0;
     HEARTBEAT_ON();
   }
-  if(u8Counter_OFF=u8OFF_TIME)
+  if(u32Counter_OFF==u32OFF_TIME)
   {
-    u8Counter_OFF=0;
     HEARTBEAT_OFF();
   }
   

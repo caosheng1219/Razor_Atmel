@@ -9,7 +9,7 @@ TriggerName=main
 LimitSize=0
 ByteLimit=50
 [DebugChecksum]
-Checksum=-1845047821
+Checksum=-904973386
 [JLinkDriver]
 CStepIntDis=_ 0
 WatchCond=_ 0
@@ -45,9 +45,13 @@ ActionState=1
 Enabled=_ 0
 [watch_formats]
 Fmt0={W}2:u32Counter	3	0
-Fmt1={W}2:u32Counter_2s	3	0
-Fmt2={W}3:G_u32SystemTime1ms	3	0
-Fmt3={W}3:UserApp_u8AdcResultCount	3	0
+Fmt1={W}2:u32Counter_100ms	3	0
+Fmt2={W}2:u32Counter_2s	3	0
+Fmt3={W}2:u32Counter_OFF	3	0
+Fmt4={W}2:u32Counter_ON	3	0
+Fmt5={W}2:u32OFF_TIME	3	0
+Fmt6={W}3:G_u32SystemTime1ms	3	0
+Fmt7={W}3:UserApp_u8AdcResultCount	3	0
 [Log file]
 LoggingEnabled=_ 0
 LogFile=_ ""
