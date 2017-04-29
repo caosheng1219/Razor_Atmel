@@ -139,7 +139,27 @@ void UserApp1RunActiveState(void)
 /*--------------------------------------------------------------------------------------------------------------------*/
 /* Private functions                                                                                                  */
 /*--------------------------------------------------------------------------------------------------------------------*/
-
+static u8 GetButtonValue(void)
+{
+  u8 u8ButtonValue=9;
+  if(IsButtonPressed(BUTTON0))
+  {
+    u8ButtonValue=1;
+  }
+  if(IsButtonPressed(BUTTON1))
+  {
+    u8ButtonValue=2;
+  }
+  if(IsButtonPressed(BUTTON2))
+  {
+    u8ButtonValue=3;
+  }
+  if(IsButtonPressed(BUTTON3))
+  {
+    u8ButtonValue=4;
+  }
+  return GetButtonValue();
+}
 
 /**********************************************************************************************************************
 State Machine Function Definitions
@@ -149,29 +169,51 @@ State Machine Function Definitions
 /* Wait for ??? */
 static void UserApp1SM_Idle(void)
 {
-  static u8 u8Counter=0;
-  static u16 u16BlinkCount=0;
+  static u8 au8InputPassword[]={10,10,10,10,10,10};
+  static u8 au8RealPassword[]={2,2,3,3,4,4};
+  static u8 u8InputPasswordCounter=0;
+  static u8 u8Index;
+  static u8 u8IsPassword=1;  
+  u8 u8tempButtonValue;
+  u8tempButtonValue=GetButtonValue();
   
-  u16BlinkCount++;
-  if(u16BlinkCount==500)
+  if(u8tempButtonValue!=9)
   {
-    u8Counter++;
-    u16BlinkCount=0;
-    
-    if(u8Counter==16)
-    {
-      u8Counter=0;
-    }
-    //更新4个LED灯的状态
-  
-  
-  
-  
-  
+    au8InputPassword[u8InputPasswordCounter]=u8tempButtonValue;
+    u8InputPasswordCounter++;
   }
-
+  if(u8InputPasswordCounter=6)
+  {
+    for(u8Index=0;u8Index<6;u8Index++)
+    {
+      if(au8InputPassword[u8Index]==au8RealPassword[u8Index])
+      {
+        u8IsPassword=1;
+        break;
+      }
+    }
+    if(u8IsPassword)
+    {
+      LedOn(WHITE);
+      LedOff(PURPLE);
+    }
+    else
+    {
+      LedOn(PURPLE);
+      LedOff(WHITE);
+    }
+  }
+  
 } /* end UserApp1SM_Idle() */
-    
+ 
+
+
+
+
+
+
+
+
 #if 0
 /*-------------------------------------------------------------------------------------------------------------------*/
 /* Handle an error */
