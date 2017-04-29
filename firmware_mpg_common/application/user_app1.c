@@ -99,7 +99,19 @@ void UserApp1Initialize(void)
     /* The task isn't properly initialized, so shut it down and don't run */
     UserApp1_StateMachine = UserApp1SM_FailedInit;
   }
+  
+  //off all LED
+  LedOff(PURPLE);
+  LedOff(WHITE);
+  LedOff(BLUE);
+  LedOff(CYAN);
+  LedOff(GREEN);
+  LedOff(YELLOW);
+  LedOff(ORANGE);
+  LedOff(RED);
+  
 
+    
 } /* end UserApp1Initialize() */
 
   
@@ -137,6 +149,26 @@ State Machine Function Definitions
 /* Wait for ??? */
 static void UserApp1SM_Idle(void)
 {
+  static u8 u8Counter=0;
+  static u16 u16BlinkCount=0;
+  
+  u16BlinkCount++;
+  if(u16BlinkCount==500)
+  {
+    u8Counter++;
+    u16BlinkCount=0;
+    
+    if(u8Counter==16)
+    {
+      u8Counter=0;
+    }
+    //更新4个LED灯的状态
+  
+  
+  
+  
+  
+  }
 
 } /* end UserApp1SM_Idle() */
     
