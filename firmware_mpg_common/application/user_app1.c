@@ -142,19 +142,19 @@ void UserApp1RunActiveState(void)
 static u8 GetButtonValue(void)
 {
   u8 u8ButtonValue=9;
-  if(IsButtonPressed(BUTTON0))
+  if(WasButtonPressed(BUTTON0))
   {
     u8ButtonValue=1;
   }
-  if(IsButtonPressed(BUTTON1))
+  if(WasButtonPressed(BUTTON1))
   {
     u8ButtonValue=2;
   }
-  if(IsButtonPressed(BUTTON2))
+  if(WasButtonPressed(BUTTON2))
   {
     u8ButtonValue=3;
   }
-  if(IsButtonPressed(BUTTON3))
+  if(WasButtonPressed(BUTTON3))
   {
     u8ButtonValue=4;
   }
@@ -173,26 +173,50 @@ static void UserApp1SM_Idle(void)
   static u8 au8RealPassword[]={2,2,3,3,4,4};
   static u8 u8InputPasswordCounter=0;
   static u8 u8Index;
-  static u8 u8IsPassword=1;  
-  u8 u8tempButtonValue;
-  u8tempButtonValue=GetButtonValue();
+  static u8 u8WasPassword=0;  
+  u8 u8tempButtonValue=9;
+   
+  if(WasButtonPressed(BUTTON0))
+  {
+    ButtonAcknowledge(BUTTON0);
+    u8tempButtonValue=1;
+  }
+  if(WasButtonPressed(BUTTON1))
+  {
+    ButtonAcknowledge(BUTTON1);
+    u8tempButtonValue=2;
+  }
+  if(WasButtonPressed(BUTTON2))
+  {
+    ButtonAcknowledge(BUTTON2);
+    u8tempButtonValue=3;
+  }
+  if(WasButtonPressed(BUTTON3))
+  {
+    ButtonAcknowledge(BUTTON3);
+    u8tempButtonValue=4;
+  }
   
+
   if(u8tempButtonValue!=9)
   {
     au8InputPassword[u8InputPasswordCounter]=u8tempButtonValue;
     u8InputPasswordCounter++;
   }
-  if(u8InputPasswordCounter=6)
+  if(u8InputPasswordCounter==6)
   {
     for(u8Index=0;u8Index<6;u8Index++)
     {
       if(au8InputPassword[u8Index]==au8RealPassword[u8Index])
       {
-        u8IsPassword=1;
-        break;
+        u8WasPassword=0;       
+      }
+      else
+      {
+        u8WasPassword=1;
       }
     }
-    if(u8IsPassword)
+    if(u8WasPassword)
     {
       LedOn(WHITE);
       LedOff(PURPLE);
@@ -202,6 +226,7 @@ static void UserApp1SM_Idle(void)
       LedOn(PURPLE);
       LedOff(WHITE);
     }
+    u8InputPasswordCounter=0;
   }
   
 } /* end UserApp1SM_Idle() */
