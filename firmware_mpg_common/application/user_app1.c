@@ -99,6 +99,14 @@ void UserApp1Initialize(void)
     /* The task isn't properly initialized, so shut it down and don't run */
     UserApp1_StateMachine = UserApp1SM_FailedInit;
   }
+  LedOff(WHITE);
+  LedOff(PURPLE);
+  LedOff(RED);
+  LedOff(BLUE);
+  LedOff(GREEN);
+  LedOff(CYAN);
+  LedOff(ORANGE);
+  LedOff(YELLOW);
 
 } /* end UserApp1Initialize() */
 
@@ -136,8 +144,80 @@ State Machine Function Definitions
 /*-------------------------------------------------------------------------------------------------------------------*/
 /* Wait for ??? */
 static void UserApp1SM_Idle(void)
-{
+{   
+  static u8 u8PasswordLength;
+  static u8 au8InputPassword[6]={10,10,10,10,10,10};
+  static u8 au8RealPassword[6]={1,1,2,2,3,3};
+  static u8 u8InputPasswordCounter=0;
+  static u8 u8Index;
+  static u8 u8WasPassword=0;  
+  static u8 u8i=0;
+  u8 u8tempButtonValue=9;
+  if(u8i==0)
+  {
+    LedOn(RED);
+  }
+  if(u8i==1)
+  {
+    LedOff(RED);
+  }
+  if(u8i==2)
+  {
+    
+    LedPWM(RED,LED_8HZ);
+  }
 
+  if(WasButtonPressed(BUTTON0))
+  {
+    ButtonAcknowledge(BUTTON0);
+    u8tempButtonValue=1;    
+  }
+  if(WasButtonPressed(BUTTON1))
+  {
+    ButtonAcknowledge(BUTTON1);
+    u8tempButtonValue=2;
+  }
+  if(WasButtonPressed(BUTTON2))
+  {
+    ButtonAcknowledge(BUTTON2);
+    u8tempButtonValue=3;
+  }
+
+  
+  if(u8tempButtonValue!=9)
+  {
+    au8InputPassword[u8InputPasswordCounter]=u8tempButtonValue;
+    u8InputPasswordCounter++;
+  }
+  
+  if(u8InputPasswordCounter==6)
+  {
+    for(u8Index=0;u8Index<6;u8Index++)
+    {
+      if(au8InputPassword[u8Index]==au8RealPassword[u8Index])
+      {
+        u8WasPassword=1;       
+      }
+      else
+      {
+        u8WasPassword=0;
+      }
+    }
+    if(u8WasPassword)
+    {
+      u8i=1;
+      LedBlink(GREEN,LED_8HZ);
+    }
+    else
+    {
+      u8i=2;
+    }
+    u8InputPasswordCounter=0;
+    
+  }
+  
+  
+  
 } /* end UserApp1SM_Idle() */
     
 #if 0
