@@ -60,7 +60,8 @@ Variable names shall start with "UserApp1_" and be declared as static.
 ***********************************************************************************************************************/
 static fnCode_type UserApp1_StateMachine;            /* The state machine function pointer */
 //static u32 UserApp1_u32Timeout;                      /* Timeout counter used across states */
-
+static u8 au8RealPassword[]={10,10,10,10,10,10,10,10,10,10};
+static u8 u8RealPasswordCount=0;
 
 /**********************************************************************************************************************
 Function Definitions
@@ -92,7 +93,7 @@ void UserApp1Initialize(void)
   /* If good initialization, set state to Idle */
   if( 1 )
   {
-    UserApp1_StateMachine = UserApp1SM_Idle;
+    UserApp1_StateMachine = UserApp1SM_SetPassword;
   }
   else
   {
@@ -135,6 +136,32 @@ void UserApp1RunActiveState(void)
 /*--------------------------------------------------------------------------------------------------------------------*/
 /* Private functions                                                                                                  */
 /*--------------------------------------------------------------------------------------------------------------------*/
+static u8 GetButtonValue(void)
+{
+  u8 u8ButtonValue=9;//no button used 
+  
+  if(WasButtonPressed(BUTTON0))
+  {
+    ButtonAcknowledge(BUTTON0);
+    u8ButtonValue=1;
+  }
+  
+  if(WasButtonPressed(BUTTON1))
+  {
+    ButtonAcknowledge(BUTTON1);
+    u8ButtonValue=2;
+  }
+  
+  if(WasButtonPressed(BUTTON2))
+  {
+    ButtonAcknowledge(BUTTON2);
+    u8ButtonValue=3;
+  }  
+  return u8ButtonValue;
+}
+
+
+
 
 
 /**********************************************************************************************************************
@@ -143,56 +170,65 @@ State Machine Function Definitions
 
 /*-------------------------------------------------------------------------------------------------------------------*/
 /* Wait for ??? */
+static void UserApp1SM_SetPassword(void)
+{
+  static bool bFlag=FALSE;
+  static u8 u8RealButtonValue;
+  
+  if(IsButtonHeld(BUTTON3, 2000))
+  {
+    LedBlink(RED, LED_1HZ);
+    LedBlink(GREEN, LED_1HZ);
+    bFlag=FALSE;
+  }
+  if(bFlag==FALSE)
+  {
+    u8RealButtonValue=GetButtonValue();
+    
+    if(u8RealButtonValue!=9)
+    {
+      au8RealPassword[u8RealPasswordCount]=u8RealButtonValue;
+      while(u8RealPasswordCount<9)
+      {        
+        u8RealPasswordCount++;
+      }
+    }
+    if(WasButtonPressed(BUTTON3))
+    {
+      ButtonAcknowledge(BUTTON3);
+      LedOn(RED);
+      LedOff(GREEN);
+      bFlag=TRUE;
+      UserApp1SM_Idle;
+    }
+  }
+}
+
+
+
+
 static void UserApp1SM_Idle(void)
 {   
-  static u8 u8PasswordLength;
-  static u8 au8InputPassword[6]={10,10,10,10,10,10};
-  static u8 au8RealPassword[6]={1,1,2,2,3,3};
+  static u8 au8InputPassword[]={10,10,10,10,10,10,10,10,10,10};
   static u8 u8InputPasswordCounter=0;
   static u8 u8Index;
   static u8 u8WasPassword=0;  
-  static u8 u8i=0;
-  u8 u8tempButtonValue=9;
-  if(u8i==0)
-  {
-    LedOn(RED);
-  }
-  if(u8i==1)
-  {
-    LedOff(RED);
-  }
-  if(u8i==2)
-  {
-    
-    LedPWM(RED,LED_8HZ);
-  }
-
-  if(WasButtonPressed(BUTTON0))
-  {
-    ButtonAcknowledge(BUTTON0);
-    u8tempButtonValue=1;    
-  }
-  if(WasButtonPressed(BUTTON1))
-  {
-    ButtonAcknowledge(BUTTON1);
-    u8tempButtonValue=2;
-  }
-  if(WasButtonPressed(BUTTON2))
-  {
-    ButtonAcknowledge(BUTTON2);
-    u8tempButtonValue=3;
-  }
-
+  static u8 u8tempButtonValue=0;
+ 
+  u8tempButtonValue=GetButtonValue();
   
   if(u8tempButtonValue!=9)
   {
     au8InputPassword[u8InputPasswordCounter]=u8tempButtonValue;
-    u8InputPasswordCounter++;
+    while(u8InputPasswordCounter<9)
+    {
+      u8InputPasswordCounter++;
+    }
   }
   
-  if(u8InputPasswordCounter==6)
+  if(u8InputPasswordCounter==u8RealPasswordCount)
   {
-    for(u8Index=0;u8Index<6;u8Index++)
+    for(u8Index=0;u8Index<u8RealPasswordCount;u8Index++)
     {
       if(au8InputPassword[u8Index]==au8RealPassword[u8Index])
       {
@@ -203,16 +239,20 @@ static void UserApp1SM_Idle(void)
         u8WasPassword=0;
       }
     }
-    if(u8WasPassword)
+    
+    if(WasButtonPressed(BUTTON3))
     {
-      u8i=1;
-      LedBlink(GREEN,LED_8HZ);
+      ButtonAcknowledge(BUTTON3);
+      if(u8WasPassword)
+      {
+        LedBlink(GREEN, LED_8HZ);
+      }
+      else
+      {
+        LedBlink(RED, LED_8HZ);
+      }
+      u8InputPasswordCounter=0;
     }
-    else
-    {
-      u8i=2;
-    }
-    u8InputPasswordCounter=0;
     
   }
   
