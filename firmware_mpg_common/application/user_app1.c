@@ -177,7 +177,7 @@ static void UserApp1SM_SetPassword(void)
   static u8 u8i=0;
   static u8 u8j=0;
   
-  if(IsButtonHeld(BUTTON3, 2000))
+  if(IsButtonHeld(BUTTON3, 2000))  //start to create a password
   {
     LedBlink(RED, LED_1HZ);
     LedBlink(GREEN, LED_1HZ);
@@ -191,7 +191,7 @@ static void UserApp1SM_SetPassword(void)
     u8j=2+u8j;
   }
   
-  if(bFlag==FALSE)
+  if(bFlag==FALSE)    //Input RealPassword
   {
     u8RealButtonValue=GetButtonValue();
     
@@ -200,7 +200,7 @@ static void UserApp1SM_SetPassword(void)
       au8RealPassword[u8RealPasswordCount]=u8RealButtonValue;
       u8RealPasswordCount++;
     }
-    if(u8i+u8j==5)
+    if(u8i+u8j==5) // change to Idle
     {
       LedOn(RED);
       LedOff(GREEN);
@@ -218,36 +218,36 @@ static void UserApp1SM_Idle(void)
   static u8 au8InputPassword[]={10,10,10,10,10,10,10,10,10,10};
   static u8 u8InputPasswordCounter=0;
   static u8 u8Index;
-  static u8 u8WasPassword=0;  
+  static u8 u8WasPasswordViewer=0;  
   static u8 u8tempButtonValue=0;
 
  
   u8tempButtonValue=GetButtonValue();
   
-  if(u8tempButtonValue!=9)
+  if(u8tempButtonValue!=9)//Get Input Password
   {
     au8InputPassword[u8InputPasswordCounter]=u8tempButtonValue;
     u8InputPasswordCounter++;
   }
   
-  if(u8InputPasswordCounter==u8RealPasswordCount)
+  if(u8InputPasswordCounter==u8RealPasswordCount) //Judge the password
   {
     for(u8Index=0;u8Index<u8RealPasswordCount;u8Index++)
     {
-      if(au8InputPassword[u8Index]==au8RealPassword[u8Index])
+      if(au8InputPassword[u8Index]!=au8RealPassword[u8Index])
       {
-        u8WasPassword=1;       
+        u8WasPasswordViewer=0;
       }
       else
       {
-        u8WasPassword=0;
+        u8WasPasswordViewer=1;
       }
     }
     
-    if(WasButtonPressed(BUTTON3))
+    if(WasButtonPressed(BUTTON3)) //show the result
     {
       ButtonAcknowledge(BUTTON3);
-      if(u8WasPassword)
+      if(u8WasPasswordViewer)
       {
         LedOff(RED);
         LedBlink(GREEN, LED_8HZ);
