@@ -53,6 +53,7 @@ extern volatile u32 G_u32ApplicationFlags;             /* From main.c */
 extern volatile u32 G_u32SystemTime1ms;                /* From board-specific source file */
 extern volatile u32 G_u32SystemTime1s;                 /* From board-specific source file */
 
+extern u8 G_u8DebugScanfCharCount;
 
 /***********************************************************************************************************************
 Global variable definitions with scope limited to this local application.
@@ -137,32 +138,21 @@ State Machine Function Definitions
 /* Wait for ??? */
 static void UserApp1SM_Idle(void)
 {
-  u8 u8ButtonValue=9;
+  u8 u8InputData[11];
+  u8 u8DataCount=0;
+  u8 u8StringInfor[]="\r\n******************\r\n";
   
-  if(WasButtonPressed(BUTTON0))
+  if(G_u8DebugScanfCharCount==10)
   {
-    ButtonAcknowledge(BUTTON0);
-    u8ButtonValue=1;
-  }
-  if(WasButtonPressed(BUTTON1))
-  {
-    ButtonAcknowledge(BUTTON1);
-    u8ButtonValue=2;
-  }
-  if(WasButtonPressed(BUTTON2))
-  {
-    ButtonAcknowledge(BUTTON2);
-    u8ButtonValue=3;
-  }
-  if(WasButtonPressed(BUTTON3))
-  {
-    ButtonAcknowledge(BUTTON3);
-    u8ButtonValue=4;
-  }
-  
-  if(u8ButtonValue!=9)
-  {
-    DebugPrintNumber(u8ButtonValue);
+    u8DataCount=DebugScanf(u8InputData);
+    DebugPrintf(u8StringInfor);
+    DebugPrintf("the data count is");
+    DebugPrintNumber(u8DataCount);
+    DebugPrintf("\r\n");
+    DebugPrintf("what you input:");
+    u8InputData[10]='\0';
+    DebugPrintf(u8InputData);
+    DebugLineFeed();
   }
 } /* end UserApp1SM_Idle() */
     
