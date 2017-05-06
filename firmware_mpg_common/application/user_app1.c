@@ -137,7 +137,33 @@ State Machine Function Definitions
 /* Wait for ??? */
 static void UserApp1SM_Idle(void)
 {
-
+  u8 u8ButtonValue=9;
+  
+  if(WasButtonPressed(BUTTON0))
+  {
+    ButtonAcknowledge(BUTTON0);
+    u8ButtonValue=1;
+  }
+  if(WasButtonPressed(BUTTON1))
+  {
+    ButtonAcknowledge(BUTTON1);
+    u8ButtonValue=2;
+  }
+  if(WasButtonPressed(BUTTON2))
+  {
+    ButtonAcknowledge(BUTTON2);
+    u8ButtonValue=3;
+  }
+  if(WasButtonPressed(BUTTON3))
+  {
+    ButtonAcknowledge(BUTTON3);
+    u8ButtonValue=4;
+  }
+  
+  if(u8ButtonValue!=9)
+  {
+    DebugPrintNumber(u8ButtonValue);
+  }
 } /* end UserApp1SM_Idle() */
     
 #if 0
