@@ -145,6 +145,16 @@ static void UserApp1SM_Idle(void)
 /* Handle an error */
 static void UserApp1SM_Error(void)          
 {
+  static u8 au8InputData[100];
+  static u8 au8StringAfterC[8];
+  static u8 au8MyName[]="caosheng";
+  static u8 u8CharCounter=0;
+  static u8 u8StringCounter=0;
+  static u8 u8ScanNameCounter=0;
+  
+  
+  
+  
   
 } /* end UserApp1SM_Error() */
 #endif
