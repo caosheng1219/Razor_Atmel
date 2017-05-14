@@ -60,7 +60,7 @@ Variable names shall start with "UserApp1_" and be declared as static.
 ***********************************************************************************************************************/
 static fnCode_type UserApp1_StateMachine;            /* The state machine function pointer */
 //static u32 UserApp1_u32Timeout;                      /* Timeout counter used across states */
-
+static u8 u8CursorPosition;
 
 /**********************************************************************************************************************
 Function Definitions
@@ -88,7 +88,33 @@ Promises:
 */
 void UserApp1Initialize(void)
 {
+  
+  LCDCommand(LCD_CLEAR_CMD);/*
+  u8 au8Message[]="Hello world!";
+  LCDMessage(LINE1_START_ADDR, au8Message);
  
+  LCDClearChars(LINE1_START_ADDR+5, 7);
+  LCDMessage(LINE2_START_ADDR,"[");
+  LCDMessage(LINE2_END_ADDR,"]");
+  LCDMessage(LINE2_START_ADDR+8,"EiE");
+  
+  LCDCommand(LCD_DISPLAY_CMD);
+  LCDCommand(LCD_DISPLAY_CMD|LCD_DISPLAY_ON);
+  LCDCommand(LCD_DISPLAY_CMD|LCD_DISPLAY_ON|LCD_DISPLAY_CURSOR);
+  LCDCommand(LCD_DISPLAY_CMD|LCD_DISPLAY_ON|LCD_DISPLAY_CURSOR|LCD_DISPLAY_BLINK);
+  LCDCommand(LCD_HOME_CMD);
+  LCDCommand(LCD_ADDRESS_CMD|LINE2_START_ADDR+6);
+  
+  LCDCommand(LCD_CLEAR_CMD);
+  u8 au8Message1[]="Caosheng";
+  LCDMessage(LINE1_START_ADDR, au8Message);
+  LCDMessage(LINE2_START_ADDR, "0");
+  LCDMessage(LINE2_START_ADDR+6, "1");
+  LCDMessage(LINE2_START_ADDR+13, "2");
+  LCDMessage(LINE2_START_ADDR+19, "3");
+  LCDCommand(LCD_CLEAR_CMD); */
+  
+  u8CursorPosition=LINE1_START_ADDR;
   /* If good initialization, set state to Idle */
   if( 1 )
   {
@@ -137,7 +163,65 @@ State Machine Function Definitions
 /* Wait for ??? */
 static void UserApp1SM_Idle(void)
 {
+  static bool bStart=FALSE;
 
+
+
+  if(WasButtonPressed(BUTTON0))
+  {
+    ButtonAcknowledge(BUTTON0);
+    if(bStart)
+    {
+      LCDCommand(LCD_DISPLAY_CMD|LCD_DISPLAY_ON);
+      bStart=FALSE;
+    }
+    else
+    {
+      LCDCommand(LCD_ADDRESS_CMD|LINE1_START_ADDR);
+      LCDCommand(LCD_DISPLAY_CMD|LCD_DISPLAY_ON|LCD_DISPLAY_CURSOR|LCD_DISPLAY_BLINK);
+      bStart=TRUE;
+    }
+  }
+  
+  if(WasButtonPressed(BUTTON3))
+  {
+    ButtonAcknowledge(BUTTON3);
+    if(u8CursorPosition==LINE1_END_ADDR)
+    {
+      u8CursorPosition=LINE2_START_ADDR;
+    }
+    else if(u8CursorPosition==LINE2_END_ADDR)
+    {
+      u8CursorPosition=LINE1_START_ADDR;
+    }
+    else
+    {
+      u8CursorPosition++;
+    }
+    LCDCommand(LCD_ADDRESS_CMD|u8CursorPosition);
+  }
+  
+  if(WasButtonPressed(BUTTON2))
+  {
+    ButtonAcknowledge(BUTTON2);
+    if(u8CursorPosition==LINE1_START_ADDR)
+    {
+      u8CursorPosition=LINE2_END_ADDR;
+    }
+    else if(u8CursorPosition==LINE2_START_ADDR)
+    {
+      u8CursorPosition=LINE1_END_ADDR;
+    }
+    else
+    {
+      u8CursorPosition--;
+    }
+    LCDCommand(LCD_ADDRESS_CMD|u8CursorPosition);
+  }
+      
+
+
+  
 } /* end UserApp1SM_Idle() */
     
 #if 0
