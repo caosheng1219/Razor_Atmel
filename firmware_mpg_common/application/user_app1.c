@@ -88,7 +88,7 @@ Promises:
 */
 void UserApp1Initialize(void)
 {
- 
+  LCDCommand(LCD_CLEAR_CMD);
   /* If good initialization, set state to Idle */
   if( 1 )
   {
@@ -137,6 +137,23 @@ State Machine Function Definitions
 /* Wait for ??? */
 static void UserApp1SM_Idle(void)
 {
+  static u8 au8Message[]="Caosheng";
+  static u8 u8StartPosition=0;
+  static u32 u32Counter=1000;
+  
+  if(--u32Counter==0)
+  {
+    u32Counter=1000;
+    u8StartPosition++;
+    if(u8StartPosition>20)
+    {
+      u8StartPosition=0;
+    }
+    LCDCommand(LCD_CLEAR_CMD);
+    LCDMessage(LINE1_START_ADDR+u8StartPosition, au8Message);
+
+  }
+
 
 } /* end UserApp1SM_Idle() */
     
