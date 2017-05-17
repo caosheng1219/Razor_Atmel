@@ -160,6 +160,7 @@ static void UserApp1SM_Idle(void)
   {
     ButtonAcknowledge(BUTTON1);
     bOn=FALSE;
+    PWMAudioOff(BUZZER1);
   }
   
   if(bOn)
@@ -168,44 +169,61 @@ static void UserApp1SM_Idle(void)
     if(u32Counter==800)
     {
       LedOn(WHITE);
+      PWMAudioSetFrequency(BUZZER1, 100);
+      PWMAudioOn(BUZZER1);
     }
     
     if(u32Counter==700)
     {
       LedOn(PURPLE);
+      PWMAudioSetFrequency(BUZZER1, 200);
+      PWMAudioOn(BUZZER1);
     }
     
     if(u32Counter==600)
     {
       LedOn(BLUE);
+      PWMAudioSetFrequency(BUZZER1, 300);
+      PWMAudioOn(BUZZER1);
     }
     
     if(u32Counter==500)
     {
       LedOn(CYAN);
+      PWMAudioSetFrequency(BUZZER1, 400);
+      PWMAudioOn(BUZZER1);
     }
     
     if(u32Counter==400)
     {
       LedOn(GREEN);
+      PWMAudioSetFrequency(BUZZER1, 500);
+      PWMAudioOn(BUZZER1);
     }
     
     if(u32Counter==300)
     {
       LedOn(YELLOW);
+      PWMAudioSetFrequency(BUZZER1, 600);
+      PWMAudioOn(BUZZER1);
     }
     
     if(u32Counter==200)
     {
       LedOn(ORANGE);
+      PWMAudioSetFrequency(BUZZER1, 700);
+      PWMAudioOn(BUZZER1);
     }
     
     if(u32Counter==100)
     {
       LedOn(RED);
+      PWMAudioSetFrequency(BUZZER1, 800);
+      PWMAudioOn(BUZZER1);
     }
     if(u32Counter==0)
     {
+      PWMAudioOff(BUZZER1);
       LedOff(WHITE);
       LedOff(PURPLE);
       LedOff(BLUE);
