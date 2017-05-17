@@ -100,6 +100,15 @@ void UserApp1Initialize(void)
     UserApp1_StateMachine = UserApp1SM_FailedInit;
   }
 
+  LedOff(WHITE);
+  LedOff(PURPLE);
+  LedOff(BLUE);
+  LedOff(CYAN);
+  LedOff(GREEN);
+  LedOff(YELLOW);
+  LedOff(ORANGE);
+  LedOff(RED);
+  
 } /* end UserApp1Initialize() */
 
   
@@ -138,20 +147,83 @@ State Machine Function Definitions
 static void UserApp1SM_Idle(void)
 {
   static u8 au8Message[]="Caosheng";
-  static u8 u8StartPosition=0;
-  static u32 u32Counter=1000;
+  static u8 u8StartPosition=20;
+  static u32 u32Counter=800;
+  static bool bOn=FALSE;
   
-  if(--u32Counter==0)
+  if(WasButtonPressed(BUTTON0))
   {
-    u32Counter=1000;
-    u8StartPosition++;
-    if(u8StartPosition>20)
+    ButtonAcknowledge(BUTTON0);
+    bOn=TRUE;
+  }
+  if(WasButtonPressed(BUTTON1))
+  {
+    ButtonAcknowledge(BUTTON1);
+    bOn=FALSE;
+  }
+  
+  if(bOn)
+  {
+    u32Counter--;
+    if(u32Counter==800)
     {
-      u8StartPosition=0;
+      LedOn(WHITE);
     }
-    LCDCommand(LCD_CLEAR_CMD);
-    LCDMessage(LINE1_START_ADDR+u8StartPosition, au8Message);
+    
+    if(u32Counter==700)
+    {
+      LedOn(PURPLE);
+    }
+    
+    if(u32Counter==600)
+    {
+      LedOn(BLUE);
+    }
+    
+    if(u32Counter==500)
+    {
+      LedOn(CYAN);
+    }
+    
+    if(u32Counter==400)
+    {
+      LedOn(GREEN);
+    }
+    
+    if(u32Counter==300)
+    {
+      LedOn(YELLOW);
+    }
+    
+    if(u32Counter==200)
+    {
+      LedOn(ORANGE);
+    }
+    
+    if(u32Counter==100)
+    {
+      LedOn(RED);
+    }
+    if(u32Counter==0)
+    {
+      LedOff(WHITE);
+      LedOff(PURPLE);
+      LedOff(BLUE);
+      LedOff(CYAN);
+      LedOff(GREEN);
+      LedOff(YELLOW);
+      LedOff(ORANGE);
+      LedOff(RED);
+      u32Counter=800;
+      u8StartPosition--;
+      if(u8StartPosition==0)
+      {
+        u8StartPosition=20;
+      }
+      LCDCommand(LCD_CLEAR_CMD);
+      LCDMessage(LINE1_START_ADDR+u8StartPosition, au8Message);
 
+    }
   }
 
 
