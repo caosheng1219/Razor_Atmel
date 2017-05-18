@@ -88,7 +88,7 @@ Promises:
 */
 void UserApp1Initialize(void)
 {
- 
+  LCDCommand(LCD_CLEAR_CMD);
   /* If good initialization, set state to Idle */
   if( 1 )
   {
@@ -137,6 +137,124 @@ State Machine Function Definitions
 /* Wait for ??? */
 static void UserApp1SM_Idle(void)
 {
+  static u8 au8AllMessage[]="Welcome to caosheng and fanyi's LCD homework!                                        ";
+  static u8 au8MessageLine1[20];   //the array to store the message display on line1
+  static u8 au8MessageLine2[20];   //the array to store the message display on line2
+  static u32 u32Counter=400;  //to count every 400ms rolls one time
+  static bool bOn=FALSE;  //the flag to control pause
+  static u8 u8Flag1=0;  //to mark where the au8MessageLine1 and au8MessageLine2 begin
+  static u8 u8Flag2=20;
+  
+  /* get value for au8MessageLine1&au8MessageLine2 */
+  for(u8 i=0;i<20;i++)
+  {
+    au8MessageLine1[i]=au8AllMessage[i+u8Flag1];  
+  }
+  for(u8 j=0;j<20;j++)
+  {
+    au8MessageLine2[j]=au8AllMessage[j+u8Flag2];
+  }
+  
+  /* use BUTTON0 to start and use BUTTON1 to pause*/
+  if(WasButtonPressed(BUTTON0))
+  {
+    ButtonAcknowledge(BUTTON0);
+    bOn=TRUE;
+  }
+  if(WasButtonPressed(BUTTON1))
+  {
+    ButtonAcknowledge(BUTTON1);
+    bOn=FALSE;
+    PWMAudioOff(BUZZER1);
+  }
+  
+  /*when pressed BUTTON0*/
+  if(bOn)
+  {
+    u32Counter--;
+    
+    /* these code is for phenomenon while the program is running*/
+    if(u32Counter==400)
+    {
+      LedOn(WHITE);
+      PWMAudioSetFrequency(BUZZER1, 100);
+      PWMAudioOn(BUZZER1);
+    }
+    
+    if(u32Counter==350)
+    {
+      LedOn(PURPLE);
+      PWMAudioSetFrequency(BUZZER1, 200);
+      PWMAudioOn(BUZZER1);
+    }
+    
+    if(u32Counter==300)
+    {
+      LedOn(BLUE);
+      PWMAudioSetFrequency(BUZZER1, 300);
+      PWMAudioOn(BUZZER1);
+    }
+    
+    if(u32Counter==250)
+    {
+      LedOn(CYAN);
+      PWMAudioSetFrequency(BUZZER1, 400);
+      PWMAudioOn(BUZZER1);
+    }
+    
+    if(u32Counter==200)
+    {
+      LedOn(GREEN);
+      PWMAudioSetFrequency(BUZZER1, 500);
+      PWMAudioOn(BUZZER1);
+    }
+    
+    if(u32Counter==150)
+    {
+      LedOn(YELLOW);
+      PWMAudioSetFrequency(BUZZER1, 600);
+      PWMAudioOn(BUZZER1);
+    }
+    
+    if(u32Counter==100)
+    {
+      LedOn(ORANGE);
+      PWMAudioSetFrequency(BUZZER1, 700);
+      PWMAudioOn(BUZZER1);
+    }
+    
+    if(u32Counter==50)
+    {
+      LedOn(RED);
+      PWMAudioSetFrequency(BUZZER1, 800);
+      PWMAudioOn(BUZZER1);
+    }
+    if(u32Counter==0)
+    {
+      PWMAudioOff(BUZZER1);
+      LedOff(WHITE);
+      LedOff(PURPLE);
+      LedOff(BLUE);
+      LedOff(CYAN);
+      LedOff(GREEN);
+      LedOff(YELLOW);
+      LedOff(ORANGE);
+      LedOff(RED);
+      u32Counter=400;
+      u8Flag1++;  //change the au8MessageLine1 and au8MessageLine2
+      u8Flag2++;
+      if(u8Flag2>65) // when au8MessageLine2 beyong au8AllMessage, refresh the flag
+      {
+        u8Flag1=0;
+        u8Flag2=20;
+      }
+      LCDCommand(LCD_CLEAR_CMD);
+      LCDMessage(LINE1_START_ADDR, au8MessageLine1);
+      LCDMessage(LINE2_START_ADDR, au8MessageLine2);
+
+    }
+  }
+
 
 } /* end UserApp1SM_Idle() */
     
