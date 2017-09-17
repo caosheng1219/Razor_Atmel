@@ -152,37 +152,10 @@ static void UserApp1SM_Idle(void)
   static u8 u8abc=0;
   
   DebugScanf(au8Flag);
-  if(au8Flag[0]!='\0')
-  {
-    au8Store[0]=au8Flag[0];
-    
-    if(au8Store[0]==1)
-    {
-      u8StateFlag=1;
-    } 
-  
-    if(au8Store[0]==2)
-    {
-      u8StateFlag=2;
-    }
- 
-    if(au8Store[0]=='\r')
-    {
-      if(u8StateFlag==1)  
-      {
-        u8abc=1;
-      }
-  
-      if(u8StateFlag==2)
-      {
-        u8abc=2;
-      }
-    }
-  }
-  
+
   
 
-  if(WasButtonPressed(BUTTON1)||u8abc==1)
+  if(WasButtonPressed(BUTTON1)||au8Flag[0]=='1')
   {
     ButtonAcknowledge(BUTTON1);  
     LCDMessage(LINE1_START_ADDR,au8LCDMessage1);
@@ -209,7 +182,7 @@ static void UserApp1SM_Idle(void)
     bBuzzerOn=FALSE;
   }
   
-  if(WasButtonPressed(BUTTON2)||u8abc==2)
+  if(WasButtonPressed(BUTTON2)||au8Flag[0]=='2')
   {
    
     ButtonAcknowledge(BUTTON2); 
@@ -225,7 +198,7 @@ static void UserApp1SM_Idle(void)
     bState2=TRUE;
     bState1=FALSE;
     LedPWM(LCD_RED,LED_PWM_100);
-    LedPWM(LCD_GREEN,LED_PWM_20);
+    LedPWM(LCD_GREEN,LED_PWM_30);
     LedOff(LCD_BLUE);
 
   }
