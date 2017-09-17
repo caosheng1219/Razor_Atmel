@@ -88,7 +88,7 @@ Promises:
 */
 void UserApp1Initialize(void)
 {
- 
+  PWMAudioSetFrequency(BUZZER1, 200);
   /* If good initialization, set state to Idle */
   if( 1 )
   {
@@ -137,34 +137,122 @@ State Machine Function Definitions
 /* Wait for ??? */
 static void UserApp1SM_Idle(void)
 {
-  static u8 au8Store[3];
-  static u8 au8Flag[];
-  static u8 au8State1="Entering state 1";
-  static u8 au8State2="Entering state 2";
-  static u8 au8LCDMessage1="STATE 1";
-  static u8 au8LCDMessage2="STATE 2";
-  static u8 u8Counter1=0;
+  static u8 au8Store[100];
+  static u8 au8Flag[1];
+  static u8 au8State1[]="Entering state 1";
+  static u8 au8State2[]="Entering state 2";
+  static u8 au8LCDMessage1[]="STATE 1             ";
+  static u8 au8LCDMessage2[]="STATE 2             ";
+  static u32 u32Counter1=0;
+  static u8 u8StateFlag=0;
+
+  static bool bState1=FALSE;
+  static bool bState2=FALSE;
+  static bool bBuzzerOn=FALSE;
+  static u8 u8abc=0;
   
   DebugScanf(au8Flag);
   if(au8Flag[0]!='\0')
   {
+    au8Store[0]=au8Flag[0];
     
+    if(au8Store[0]==1)
+    {
+      u8StateFlag=1;
+    } 
+  
+    if(au8Store[0]==2)
+    {
+      u8StateFlag=2;
+    }
+ 
+    if(au8Store[0]=='\r')
+    {
+      if(u8StateFlag==1)  
+      {
+        u8abc=1;
+      }
+  
+      if(u8StateFlag==2)
+      {
+        u8abc=2;
+      }
+    }
   }
   
   
-  if(WasButtonPressed(BUTTON1)||u8Flag==1)
+
+  if(WasButtonPressed(BUTTON1)||u8abc==1)
   {
-    ButtonAcknowledge(BUTTON1);
-    DebugPrintf(au8State1);
+    ButtonAcknowledge(BUTTON1);  
     LCDMessage(LINE1_START_ADDR,au8LCDMessage1);
     LedOn(WHITE);
-    LedOn(PRUPLE);
+    LedOn(PURPLE);
     LedOn(BLUE);
     LedOn(CYAN);
-    BuzzerOff(BUZZER1);
+    LedOff(RED);
+    LedOff(YELLOW);
+    LedOff(ORANGE);
+    LedOff(GREEN);
+    bState1=TRUE;
+    bState2=FALSE;
+ 
+    LedPWM(LCD_RED,LED_PWM_100);
+    LedOff(LCD_GREEN);
+    LedPWM(LCD_BLUE,LED_PWM_100);
+  }
+  if(bState1)
+  {
+    DebugPrintf(au8State1);
+    bState1=FALSE;
+    PWMAudioOff(BUZZER1);
+    bBuzzerOn=FALSE;
   }
   
+  if(WasButtonPressed(BUTTON2)||u8abc==2)
+  {
+   
+    ButtonAcknowledge(BUTTON2); 
+    LCDMessage(LINE1_START_ADDR,au8LCDMessage2);
+    LedBlink(GREEN,LED_1HZ);
+    LedBlink(YELLOW,LED_2HZ);
+    LedBlink(ORANGE,LED_4HZ);
+    LedBlink(RED,LED_8HZ);
+    LedOff(WHITE);
+    LedOff(PURPLE);
+    LedOff(BLUE);
+    LedOff(CYAN);
+    bState2=TRUE;
+    bState1=FALSE;
+    LedPWM(LCD_RED,LED_PWM_100);
+    LedPWM(LCD_GREEN,LED_PWM_20);
+    LedOff(LCD_BLUE);
+
+  }
+  if(bState2)
+  {
+    DebugPrintf(au8State2);
+    bState2=FALSE;
+    bBuzzerOn=TRUE;
+  }
   
+  if(bBuzzerOn)
+  { 
+
+    u32Counter1++;
+    if(u32Counter1<100)
+    {
+      PWMAudioOn(BUZZER1);
+    }
+    if(u32Counter1==100)
+    {
+      PWMAudioOff(BUZZER1);
+    }
+    if(u32Counter1==1000)
+    {
+      u32Counter1=0;
+    }
+  }
 } /* end UserApp1SM_Idle() */
     
 #if 0
