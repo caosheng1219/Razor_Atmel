@@ -137,7 +137,34 @@ State Machine Function Definitions
 /* Wait for ??? */
 static void UserApp1SM_Idle(void)
 {
-
+  static u8 au8Store[3];
+  static u8 au8Flag[];
+  static u8 au8State1="Entering state 1";
+  static u8 au8State2="Entering state 2";
+  static u8 au8LCDMessage1="STATE 1";
+  static u8 au8LCDMessage2="STATE 2";
+  static u8 u8Counter1=0;
+  
+  DebugScanf(au8Flag);
+  if(au8Flag[0]!='\0')
+  {
+    
+  }
+  
+  
+  if(WasButtonPressed(BUTTON1)||u8Flag==1)
+  {
+    ButtonAcknowledge(BUTTON1);
+    DebugPrintf(au8State1);
+    LCDMessage(LINE1_START_ADDR,au8LCDMessage1);
+    LedOn(WHITE);
+    LedOn(PRUPLE);
+    LedOn(BLUE);
+    LedOn(CYAN);
+    BuzzerOff(BUZZER1);
+  }
+  
+  
 } /* end UserApp1SM_Idle() */
     
 #if 0
