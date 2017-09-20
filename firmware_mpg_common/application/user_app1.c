@@ -61,7 +61,9 @@ Variable names shall start with "UserApp1_" and be declared as static.
 static fnCode_type UserApp1_StateMachine;            /* The state machine function pointer */
 //static u32 UserApp1_u32Timeout;                      /* Timeout counter used across states */
 
-
+  static bool bState1=FALSE;
+  static bool bState2=FALSE;
+  static bool bBuzzerOn=FALSE;
 /**********************************************************************************************************************
 Function Definitions
 **********************************************************************************************************************/
@@ -142,10 +144,6 @@ static void UserApp1SM_Idle(void)
   static u16 u16Counter1=0;    //a counter control buzzer
   static u16 u16Counter2=0;    //a counter to help store something inputted
 
-  static bool bState1=FALSE;
-  static bool bState2=FALSE;
-  static bool bBuzzerOn=FALSE;
-
   
   DebugScanf(au8Input);
 
@@ -160,12 +158,20 @@ static void UserApp1SM_Idle(void)
   {
     bState1=TRUE;
     bState2=FALSE;
+    for(u8 u8i=0;u8i<100;u8i++)
+    {
+      au8Store[u8i]='\0';
+    }
   }
   
   if(au8Store[u16Counter2-2]=='2'&&au8Store[u16Counter2-1]=='\r')
   {
     bState2=TRUE;
     bState1=FALSE;
+    for(u8 u8i=0;u8i<100;u8i++)
+    {
+      au8Store[u8i]='\0';
+    }
   }
   
   if(WasButtonPressed(BUTTON1))
@@ -186,44 +192,13 @@ static void UserApp1SM_Idle(void)
   /*enter state*/
   if(bState1)
   {
-    LCDMessage(LINE1_START_ADDR,"STATE 1             ");
-    LedOn(WHITE);
-    LedOn(PURPLE);
-    LedOn(BLUE);
-    LedOn(CYAN);
-    LedOff(RED);
-    LedOff(YELLOW);
-    LedOff(ORANGE);
-    LedOff(GREEN);
-    LedPWM(LCD_RED,LED_PWM_100);
-    LedOff(LCD_GREEN);
-    LedPWM(LCD_BLUE,LED_PWM_100);
-    DebugPrintf("Entering state 1");
-    DebugPrintf("\n\r");
-    bState1=FALSE;
-    PWMAudioOff(BUZZER1);
-    bBuzzerOn=FALSE;  
+    UserApp1_StateMachine=UserApp1SM_StateMachine1;
   }
   
 
   if(bState2)
   {
-    LCDMessage(LINE1_START_ADDR,"STATE 2             ");
-    LedBlink(GREEN,LED_1HZ);
-    LedBlink(YELLOW,LED_2HZ);
-    LedBlink(ORANGE,LED_4HZ);
-    LedBlink(RED,LED_8HZ);
-    LedOff(WHITE);
-    LedOff(PURPLE);
-    LedOff(BLUE);
-    LedOff(CYAN);
-    LedPWM(LCD_RED,LED_PWM_100);
-    LedPWM(LCD_GREEN,LED_PWM_30);
-    LedOff(LCD_BLUE);
-    DebugPrintf("Entering state 2");
-    DebugPrintf("\n\r");
-    bState2=FALSE;
-    bBuzzerOn=TRUE;
+    UserApp1_StateMachine=UserApp1SM_StateMachine2;
   }
   
   if(bBuzzerOn)
@@ -261,6 +236,56 @@ static void UserApp1SM_FailedInit(void)
 {
     
 } /* end UserApp1SM_FailedInit() */
+
+
+static void UserApp1SM_StateMachine1(void)
+{
+    LCDMessage(LINE1_START_ADDR,"STATE 1             ");
+    LedOn(WHITE);
+    LedOn(PURPLE);
+    LedOn(BLUE);
+    LedOn(CYAN);
+    LedOff(RED);
+    LedOff(YELLOW);
+    LedOff(ORANGE);
+    LedOff(GREEN);
+    LedPWM(LCD_RED,LED_PWM_100);
+    LedOff(LCD_GREEN);
+    LedPWM(LCD_BLUE,LED_PWM_100);
+    DebugPrintf("Entering state 1");
+    DebugPrintf("\n\r");
+    bState1=FALSE;
+    PWMAudioOff(BUZZER1);
+    bBuzzerOn=FALSE;  
+    
+    UserApp1_StateMachine=UserApp1SM_Idle;
+}
+
+static void UserApp1SM_StateMachine2(void)
+{  
+    LCDMessage(LINE1_START_ADDR,"STATE 2             ");
+    LedBlink(GREEN,LED_1HZ);
+    LedBlink(YELLOW,LED_2HZ);
+    LedBlink(ORANGE,LED_4HZ);
+    LedBlink(RED,LED_8HZ);
+    LedOff(WHITE);
+    LedOff(PURPLE);
+    LedOff(BLUE);
+    LedOff(CYAN);
+    LedPWM(LCD_RED,LED_PWM_100);
+    LedPWM(LCD_GREEN,LED_PWM_30);
+    LedOff(LCD_BLUE);
+    DebugPrintf("Entering state 2");
+    DebugPrintf("\n\r");
+    bState2=FALSE;
+    bBuzzerOn=TRUE;
+    
+    UserApp1_StateMachine=UserApp1SM_Idle;
+}
+
+
+
+
 
 
 /*--------------------------------------------------------------------------------------------------------------------*/
