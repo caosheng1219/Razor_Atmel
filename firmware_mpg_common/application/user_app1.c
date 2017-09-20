@@ -139,9 +139,8 @@ static void UserApp1SM_Idle(void)
 {
   static u8 au8Store[100];
   static u8 au8Input[1];
-  static u16 u16Counter1=0;
-  static u16 u16Counter2=0;
-  static u8 u8StateFlag=0;
+  static u16 u16Counter1=0;    //a counter control buzzer
+  static u16 u16Counter2=0;    //a counter to help store something inputted
 
   static bool bState1=FALSE;
   static bool bState2=FALSE;
@@ -150,33 +149,41 @@ static void UserApp1SM_Idle(void)
   
   DebugScanf(au8Input);
 
-  if(au8Input[0]!='\0')
+  if(au8Input[0]!='\0')      // store data 
   {
-    au8Store[u16Counter2++]=au8Input[0];
+    au8Store[u16Counter2]=au8Input[0];
+    u16Counter2++;
+    au8Input[0]='\0';
+  }
+  /*change state*/
+  if(au8Store[u16Counter2-2]=='1'&&au8Store[u16Counter2-1]=='\r')  
+  {
+    bState1=TRUE;
+    bState2=FALSE;
   }
   
-  for(u16 u16Counter3=0;u16Counter3<100;u16Counter3++)
+  if(au8Store[u16Counter2-2]=='2'&&au8Store[u16Counter2-1]=='\r')
   {
-    if(au8Store[u16Counter3]=='1'&&au8Store[u16Counter3+1]=='\r')
-    {
-      u8StateFlag=1;
-      DebugPrintf("\r\n");
-    }
-    
-    if(au8Store[u16Counter3]=='2'&&au8Store[u16Counter3+1]=='\r')
-    {
-      u8StateFlag=2;
-      DebugPrintf("\r\n");
-    }
+    bState2=TRUE;
+    bState1=FALSE;
   }
-
-  if(WasButtonPressed(BUTTON1)|| (u8StateFlag==1))
+  
+  if(WasButtonPressed(BUTTON1))
   {
     ButtonAcknowledge(BUTTON1);  
     bState1=TRUE;
     bState2=FALSE;    
   }
  
+  if(WasButtonPressed(BUTTON2))
+  {
+    ButtonAcknowledge(BUTTON2);     
+    bState2=TRUE;
+    bState1=FALSE;
+  }
+  /*change state complete*/
+  
+  /*enter state*/
   if(bState1)
   {
     LCDMessage(LINE1_START_ADDR,"STATE 1             ");
@@ -198,13 +205,7 @@ static void UserApp1SM_Idle(void)
     bBuzzerOn=FALSE;  
   }
   
-  if(WasButtonPressed(BUTTON2)|| (u8StateFlag==2))
-  {  
-    ButtonAcknowledge(BUTTON2);     
-    bState2=TRUE;
-    bState1=FALSE;
-  }
-  
+
   if(bState2)
   {
     LCDMessage(LINE1_START_ADDR,"STATE 2             ");
