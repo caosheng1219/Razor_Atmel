@@ -142,9 +142,7 @@ void UserAppInitialize(void)
     LedOn(YELLOW);
 #endif /* MPG1 */
     
-#ifdef MPG2
-    LedOn(GREEN0);
-#endif /* MPG2 */
+
     
     UserApp_StateMachine = UserAppSM_Idle;
   }
@@ -155,9 +153,6 @@ void UserAppInitialize(void)
     LedBlink(RED, LED_4HZ);
 #endif /* MPG1 */
     
-#ifdef MPG2
-    LedBlink(RED0, LED_4HZ);
-#endif /* MPG2 */
 
     UserApp_StateMachine = UserAppSM_Error;
   }
@@ -199,28 +194,31 @@ State Machine Function Definitions
 /* Wait for a message to be queued */
 static void UserAppSM_Idle(void)
 {
+  staitc u8 u8Countdown=10;
+  static u8 u8Counter=1000;
   /* Look for BUTTON 0 to open channel */
   if(WasButtonPressed(BUTTON0))
   {
     /* Got the button, so complete one-time actions before next state */
     ButtonAcknowledge(BUTTON0);
+    u8Counter--;
+    if(u8Counter==0)
+    {
+      u8Countdown--;
+    }
     
-    /* Queue open channel and change LED0 from yellow to blinking green to indicate channel is opening */
-    AntOpenChannel();
+    if(u8Countdown==0)
+    {
+      /* Queue open channel and change LED0 from yellow to blinking green to indicate channel is opening */
+      AntOpenChannel();
+      LedOff(YELLOW);
+      LedBlink(GREEN, LED_2HZ);
+      
+      /* Set timer and advance states */
+      UserApp_u32Timeout = G_u32SystemTime1ms;
+      UserApp_StateMachine = UserAppSM_WaitChannelOpen;
+    }
 
-#ifdef MPG1
-    LedOff(YELLOW);
-    LedBlink(GREEN, LED_2HZ);
-#endif /* MPG1 */    
-    
-#ifdef MPG2
-    LedOff(RED0);
-    LedBlink(GREEN0, LED_2HZ);
-#endif /* MPG2 */
-    
-    /* Set timer and advance states */
-    UserApp_u32Timeout = G_u32SystemTime1ms;
-    UserApp_StateMachine = UserAppSM_WaitChannelOpen;
   }
     
 } /* end UserAppSM_Idle() */
@@ -236,11 +234,7 @@ static void UserAppSM_WaitChannelOpen(void)
 #ifdef MPG1
     LedOn(GREEN);
 #endif /* MPG1 */    
-    
-#ifdef MPG2
-    LedOn(GREEN0);
-#endif /* MPG2 */
-    
+      
     UserApp_StateMachine = UserAppSM_ChannelOpen;
   }
   
@@ -254,11 +248,7 @@ static void UserAppSM_WaitChannelOpen(void)
     LedOn(YELLOW);
 #endif /* MPG1 */    
     
-#ifdef MPG2
-    LedOn(RED0);
-    LedOn(GREEN0);
-#endif /* MPG2 */
-    
+
     UserApp_StateMachine = UserAppSM_Idle;
   }
     
@@ -292,11 +282,7 @@ static void UserAppSM_ChannelOpen(void)
     LedBlink(GREEN, LED_2HZ);
 #endif /* MPG1 */    
     
-#ifdef MPG2
-    LedOff(RED0);
-    LedOff(BLUE0);
-    LedBlink(GREEN0, LED_2HZ);
-#endif /* MPG2 */
+
     
     /* Set timer and advance states */
     UserApp_u32Timeout = G_u32SystemTime1ms;
@@ -333,10 +319,7 @@ static void UserAppSM_ChannelOpen(void)
         LCDMessage(LINE2_START_ADDR, au8DataContent); 
 #endif /* MPG1 */    
     
-#ifdef MPG2
-        PixelAddressType sStringLocation = {LCD_SMALL_FONT_LINE4, LCD_LEFT_MOST_COLUMN}; 
-        LcdLoadString(au8DataContent, LCD_FONT_SMALL, &sStringLocation); 
-#endif /* MPG2 */
+
 
         /* Update our local message counter and send the message back */
         au8TestMessage[7]++;
@@ -375,29 +358,7 @@ static void UserAppSM_ChannelOpen(void)
         }
 #endif /* MPG1 */    
     
-#ifdef MPG2
-        if(G_au8AntApiCurrentData[0] == 0xA5)
-        {
-          LedOff(RED3);
-          LedOff(GREEN3);
-          LedOff(BLUE3);
-          
-          if(G_au8AntApiCurrentData[1] == 1)
-          {
-            LedOn(RED3);
-          }
-          
-          if(G_au8AntApiCurrentData[2] == 1)
-          {
-            LedOn(GREEN3);
-          }
 
-          if(G_au8AntApiCurrentData[3] == 1)
-          {
-            LedOn(BLUE3);
-          }
-        }
-#endif /* MPG2 */
       } /* end if(bGotNewData) */
     } /* end if(G_eAntApiCurrentMessageClass == ANT_DATA) */
     
@@ -441,31 +402,7 @@ static void UserAppSM_ChannelOpen(void)
             break;
           }
 #endif /* MPG 1 */
-#ifdef MPG2
-          /* If we are synced with a device, blue is solid */
-          case RESPONSE_NO_ERROR:
-          {
-            LedOff(GREEN0);
-            LedOn(BLUE0);
-            break;
-          }
 
-          /* If we are paired but missing messages, blue blinks */
-          case EVENT_RX_FAIL:
-          {
-            LedOff(GREEN0);
-            LedBlink(BLUE0, LED_2HZ);
-            break;
-          }
-
-          /* If we drop to search, LED is green */
-          case EVENT_RX_FAIL_GO_TO_SEARCH:
-          {
-            LedOff(BLUE0);
-            LedOn(GREEN0);
-            break;
-          }
-#endif /* MPG 2 */
           /* If the search times out, the channel should automatically close */
           case EVENT_RX_SEARCH_TIMEOUT:
           {
@@ -492,10 +429,7 @@ static void UserAppSM_ChannelOpen(void)
     LedOff(BLUE);
 #endif /* MPG1 */
 
-#ifdef MPG2
-    LedBlink(GREEN0, LED_2HZ);
-    LedOff(BLUE0);
-#endif /* MPG2 */
+
     u8LastState = 0xff;
     
     UserApp_u32Timeout = G_u32SystemTime1ms;
@@ -517,10 +451,7 @@ static void UserAppSM_WaitChannelClose(void)
     LedOn(YELLOW);
 #endif /* MPG1 */
 
-#ifdef MPG2
-    LedOn(GREEN0);
-    LedOn(RED0);
-#endif /* MPG2 */
+
     UserApp_StateMachine = UserAppSM_Idle;
   }
   
@@ -533,10 +464,6 @@ static void UserAppSM_WaitChannelClose(void)
     LedBlink(RED, LED_4HZ);
 #endif /* MPG1 */
 
-#ifdef MPG2
-    LedBlink(RED0, LED_4HZ);
-    LedOff(GREEN0);
-#endif /* MPG2 */
     
     UserApp_StateMachine = UserAppSM_Error;
   }
