@@ -9,7 +9,7 @@ TriggerName=main
 LimitSize=0
 ByteLimit=50
 [DebugChecksum]
-Checksum=905873605
+Checksum=1730398647
 [JLinkDriver]
 CStepIntDis=_ 0
 WatchCond=_ 0
@@ -43,6 +43,16 @@ UnspecRange=1
 ActionState=1
 [CodeCoverage]
 Enabled=_ 0
+[struct_types]
+Fmt0=AntExtendedDataType-s8RSSI	3	0
+Fmt1=AntExtendedDataType-u8Flags	3	0
+[array_types]
+Fmt0=u8[20]	3	0
+Fmt1=u8[7]	3	0
+[watch_formats]
+Fmt0={W}3:s8RssiChannel0	3	0
+Fmt1={W}3:u16Counter	3	0
+Fmt2={W}3:u8Countdown	3	0
 [Log file]
 LoggingEnabled=_ 0
 LogFile=_ ""
@@ -62,8 +72,7 @@ Exclusions=
 mode=0
 [Breakpoints2]
 Bp0=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\application\mpgl1_board_test.c}.382.5" 0 0 1 "" 0 "" 0
-Bp1=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\firmware_mpg_common\drivers\ant.c}.1481.3" 0 0 1 "" 0 "" 0
-Count=2
+Count=1
 [Aliases]
 Count=0
 SuppressDialog=0
