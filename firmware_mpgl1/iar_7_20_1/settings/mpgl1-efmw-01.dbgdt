@@ -82,7 +82,7 @@
           
           
           
-        <item>G_u32SystemTime1ms</item><item>G_u32SystemTime1s</item><item>Ant_au8AntRxBuffer</item><item></item></expressions>
+        <item>G_u32SystemTime1ms</item><item>G_u32SystemTime1s</item><item>Ant_au8AntRxBuffer</item><item/></expressions>
         <col-names>
           
           
@@ -116,7 +116,7 @@
       <WATCH_3>
         <expressions>
           
-        <item>u16Counter</item><item>u8Countdown</item><item>au8Lcdmessage</item><item>u8aTemp</item><item>temp</item><item>s8RssiChannel0</item><item>G_sAntApiCurrentMessageExtData</item><item>AntOpenChannelNumber</item><item>UserApp1_StateMachine</item><item></item></expressions>
+        <item>u16Counter</item><item>u8Countdown</item><item>au8Lcdmessage</item><item>u8aTemp</item><item>temp</item><item>s8RssiChannel0</item><item>G_sAntApiCurrentMessageExtData</item><item>AntOpenChannelNumber</item><item>UserApp1_StateMachine</item><item/></expressions>
         <col-names>
           
           

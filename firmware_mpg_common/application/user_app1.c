@@ -111,16 +111,7 @@ void UserApp1Initialize(void)
 
 #endif /* EIE1 */
   
-#ifdef MPG2
-  PixelAddressType sStringLocation = {LCD_SMALL_FONT_LINE0, LCD_LEFT_MOST_COLUMN}; 
-  LcdClearScreen();
-  LcdLoadString(au8WelcomeMessage, LCD_FONT_SMALL, &sStringLocation); 
-  sStringLocation.u16PixelRowAddress = LCD_SMALL_FONT_LINE1;
-  LcdLoadString(au8Instructions, LCD_FONT_SMALL, &sStringLocation); 
-  
-  /* Start with LED0 in RED state = channel is not configured */
-  LedOn(RED0);
-#endif /* MPG2 */
+
   
  /* Configure ANT for this application */
   sAntSetupData.AntChannel          = ANT_CHANNEL_USERAPP;
@@ -370,107 +361,110 @@ static void UserApp1SM_ChannelOpen(void)
     au8Temp[2] = u8Temp%10 + 48;
     LCDMessage(LINE1_END_ADDR-6, au8Temp);
     
-    if(s8RssiChannel0>-120&&s8RssiChannel0<-110)
+    if(bFound=FALSE)
     {
-      LedOn(ORANGE);
-      LedOff(RED);
-      LedOff(PURPLE);
-      LedOff(CYAN);
-      LedOff(RED);
-      LedOff(BLUE);
-      LedOff(GREEN);
-      LedOff(WHITE);
-    }
-    if(s8RssiChannel0>-110&&s8RssiChannel0<-100)
-    {
-      LedOn(ORANGE);
-      LedOn(RED);
-      LedOff(PURPLE);
-      LedOff(CYAN);
-      LedOff(RED);
-      LedOff(BLUE);
-      LedOff(GREEN);
-      LedOff(WHITE);
-    }
-    if(s8RssiChannel0>-100&&s8RssiChannel0<-90)
-    {
-      LedOn(ORANGE);
-      LedOn(RED);
-      LedOn(PURPLE);
-      LedOff(CYAN);
-      LedOff(RED);
-      LedOff(BLUE);
-      LedOff(GREEN);
-      LedOff(WHITE);
-    }
-    if(s8RssiChannel0>-90&&s8RssiChannel0<-80)
-    {
-      LedOn(ORANGE);
-      LedOn(RED);
-      LedOn(PURPLE);
-      LedOn(CYAN);
-      LedOff(RED);
-      LedOff(BLUE);
-      LedOff(GREEN);
-      LedOff(WHITE);
-    }
-    if(s8RssiChannel0>-80&&s8RssiChannel0<-70)
-    {
-      LedOn(ORANGE);
-      LedOn(RED);
-      LedOn(PURPLE);
-      LedOn(CYAN);
-      LedOn(RED);
-      LedOff(BLUE);
-      LedOff(GREEN);
-      LedOff(WHITE);
-    }
-    if(s8RssiChannel0>-70&&s8RssiChannel0<-60)
-    {
-      LedOn(ORANGE);
-      LedOn(RED);
-      LedOn(PURPLE);
-      LedOn(CYAN);
-      LedOn(RED);
-      LedOn(BLUE);
-      LedOff(GREEN);
-      LedOff(WHITE);
-    }
-    if(s8RssiChannel0>-60&&s8RssiChannel0<-50)
-    {
-      LedOn(ORANGE);
-      LedOn(RED);
-      LedOn(PURPLE);
-      LedOn(CYAN);
-      LedOn(RED);
-      LedOn(BLUE);
-      LedOn(GREEN);
-      LedOff(WHITE);
-    }
-    if(s8RssiChannel0>-50&&s8RssiChannel0<-40)
-    {
-      LedOn(ORANGE);
-      LedOn(RED);
-      LedOn(PURPLE);
-      LedOn(CYAN);
-      LedOn(RED);
-      LedOn(BLUE);
-      LedOn(GREEN);
-      LedOn(WHITE);
-      
-    }
-    if(s8RssiChannel0==40)
-    {
-      LedOff(ORANGE);
-      LedOff(RED);
-      LedOff(PURPLE);
-      LedOff(CYAN);
-      LedOff(RED);
-      LedOff(BLUE);
-      LedOff(GREEN);
-      LedOff(WHITE);
-      bFound=TRUE;
-  
+      if(s8RssiChannel0>-120&&s8RssiChannel0<-110)
+      {
+        LedOn(ORANGE);
+        LedOff(RED);
+        LedOff(PURPLE);
+        LedOff(CYAN);
+        LedOff(RED);
+        LedOff(BLUE);
+        LedOff(GREEN);
+        LedOff(WHITE);
+      }
+      if(s8RssiChannel0>-110&&s8RssiChannel0<-100)
+      {
+        LedOn(ORANGE);
+        LedOn(RED);
+        LedOff(PURPLE);
+        LedOff(CYAN);
+        LedOff(RED);
+        LedOff(BLUE);
+        LedOff(GREEN);
+        LedOff(WHITE);
+      }
+      if(s8RssiChannel0>-100&&s8RssiChannel0<-90)
+      {
+        LedOn(ORANGE);
+        LedOn(RED);
+        LedOn(PURPLE);
+        LedOff(CYAN);
+        LedOff(RED);
+        LedOff(BLUE);
+        LedOff(GREEN);
+        LedOff(WHITE);
+      }
+      if(s8RssiChannel0>-90&&s8RssiChannel0<-80)
+      {
+        LedOn(ORANGE);
+        LedOn(RED);
+        LedOn(PURPLE);
+        LedOn(CYAN);
+        LedOff(RED);
+        LedOff(BLUE);
+        LedOff(GREEN);
+        LedOff(WHITE);
+      }
+      if(s8RssiChannel0>-80&&s8RssiChannel0<-70)
+      {
+        LedOn(ORANGE);
+        LedOn(RED);
+        LedOn(PURPLE);
+        LedOn(CYAN);
+        LedOn(RED);
+        LedOff(BLUE);
+        LedOff(GREEN);
+        LedOff(WHITE);
+      }
+      if(s8RssiChannel0>-70&&s8RssiChannel0<-60)
+      {
+        LedOn(ORANGE);
+        LedOn(RED);
+        LedOn(PURPLE);
+        LedOn(CYAN);
+        LedOn(RED);
+        LedOn(BLUE);
+        LedOff(GREEN);
+        LedOff(WHITE);
+      }
+      if(s8RssiChannel0>-60&&s8RssiChannel0<-50)
+      {
+        LedOn(ORANGE);
+        LedOn(RED);
+        LedOn(PURPLE);
+        LedOn(CYAN);
+        LedOn(RED);
+        LedOn(BLUE);
+        LedOn(GREEN);
+        LedOff(WHITE);
+      }
+      if(s8RssiChannel0>-50&&s8RssiChannel0<-40)
+      {
+        LedOn(ORANGE);
+        LedOn(RED);
+        LedOn(PURPLE);
+        LedOn(CYAN);
+        LedOn(RED);
+        LedOn(BLUE);
+        LedOn(GREEN);
+        LedOn(WHITE);
+        
+      }
+      if(s8RssiChannel0==40)
+      {
+        LedOff(ORANGE);
+        LedOff(RED);
+        LedOff(PURPLE);
+        LedOff(CYAN);
+        LedOff(RED);
+        LedOff(BLUE);
+        LedOff(GREEN);
+        LedOff(WHITE);
+        bFound=TRUE;
+    
+      }
     }
     if(bFound)
     {
@@ -482,7 +476,7 @@ static void UserApp1SM_ChannelOpen(void)
       LedBlink(BLUE,LED_2HZ);
       LedBlink(GREEN,LED_2HZ);
       LedBlink(WHITE,LED_2HZ);
-      bFound=FALSE;
+      
     }
     
     
