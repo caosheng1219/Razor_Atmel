@@ -201,7 +201,7 @@ static void UserApp1SM_WaitChannelAssign(void)
   /* Check if the channel assignment is complete */
   if(AntRadioStatusChannel(ANT_CHANNEL_USERAPP) == ANT_CONFIGURED)
   {
-    UserApp1_StateMachine = UserApp1SM_Idle;
+    UserApp1_StateMachine = UserApp1SM_Assignrole;
   }
   
   /* Monitor for timeout */
@@ -213,10 +213,42 @@ static void UserApp1SM_WaitChannelAssign(void)
       
 } /* end UserApp1SM_WaitChannelAssign() */
 
-
+static void UserApp1SM_Assignrole(void)
+{
+  u8 au8AssignMessage[] = "Assign your role";
+  u8 au8Instructions[] = "B0 Hider  B1 Seeker";
+  
+  LCDCommand(LCD_CLEAR_CMD);
+  LCDMessage(LINE1_START_ADDR, au8WelcomeMessage); 
+  LCDMessage(LINE2_START_ADDR, au8Instructions); 
+  
+  if(WasButtonPressed(BUTTON0))
+  {
+    ButtonAcknowledge(BUTTON0);
+    
+    LCDCommand(LCD_CLEAR_CMD);
+    LCDMessage(LINE1_START_ADDR, B0 Start); 
+    
+    UserApp1_StateMachine=UserApp1SM_Hider;
+  }
+  
+  if(WasButtonPressed(BUTTON1))
+  {
+    ButtonAcknowledge(BUTTON1);
+    
+    LCDCommand(LCD_CLEAR_CMD);
+    LCDMessage(LINE1_START_ADDR, B0 Start); 
+    
+    UserApp1_StateMachine=UserApp1SM_Seeker;
+  }
+  
+  
+  
+  
+}
   /*-------------------------------------------------------------------------------------------------------------------*/
 /* Wait for a message to be queued */
-static void UserApp1SM_Idle(void)
+static void UserApp1SM_Seeker(void)
 {
   static u16 u16Counter=10000;
   static bool bCountdown=FALSE;
