@@ -71,14 +71,14 @@ void UserApp1RunActiveState(void);
 State Machine Declarations
 ***********************************************************************************************************************/
 static void UserApp1SM_WaitChannelAssign(void);
-static void UserApp1SM_Idle(void);    
+static void UserApp1SM_Assignrole(void);  
 static void UserApp1SM_WaitChannelOpen(void);
 static void UserApp1SM_ChannelOpen(void);
 static void UserApp1SM_WaitChannelClose(void);
-
+static void UserApp1SM_Seeker(void);
 static void UserApp1SM_Error(void);         
 static void UserApp1SM_FailedInit(void);        
-
+static void UserApp1SM_Hider(void);
 static void AntGetdBmAscii(s8 s8Data);
 #endif /* __USER_APP_H */
 

@@ -97,8 +97,8 @@ Promises:
 */
 void UserApp1Initialize(void)
 {
-  u8 au8WelcomeMessage[] = "Hide and Go Seek";
-  u8 au8Instructions[] = "B0 start game";
+  u8 au8WelcomeMessage[] = "Assign your role";
+  u8 au8Instructions[] = "B0 Hider  B1 Seeker";
   AntAssignChannelInfoType sAntSetupData;
   
   /* Clear screen and place start messages */
@@ -107,6 +107,16 @@ void UserApp1Initialize(void)
   LCDMessage(LINE1_START_ADDR, au8WelcomeMessage); 
   LCDMessage(LINE2_START_ADDR, au8Instructions); 
 
+  
+  
+  LedOff(ORANGE);
+  LedOff(RED);
+  LedOff(PURPLE);
+  LedOff(CYAN);
+  LedOff(RED);
+  LedOff(BLUE);
+  LedOff(GREEN);
+  LedOff(WHITE);
   /* Start with LED0 in RED state = channel is not configured */
 
 #endif /* EIE1 */
@@ -215,19 +225,16 @@ static void UserApp1SM_WaitChannelAssign(void)
 
 static void UserApp1SM_Assignrole(void)
 {
-  u8 au8AssignMessage[] = "Assign your role";
-  u8 au8Instructions[] = "B0 Hider  B1 Seeker";
-  
-  LCDCommand(LCD_CLEAR_CMD);
-  LCDMessage(LINE1_START_ADDR, au8WelcomeMessage); 
-  LCDMessage(LINE2_START_ADDR, au8Instructions); 
-  
+
+
+
+
   if(WasButtonPressed(BUTTON0))
   {
     ButtonAcknowledge(BUTTON0);
-    
+
     LCDCommand(LCD_CLEAR_CMD);
-    LCDMessage(LINE1_START_ADDR, B0 Start); 
+    LCDMessage(LINE1_START_ADDR, "B0 Start"); 
     
     UserApp1_StateMachine=UserApp1SM_Hider;
   }
@@ -235,15 +242,23 @@ static void UserApp1SM_Assignrole(void)
   if(WasButtonPressed(BUTTON1))
   {
     ButtonAcknowledge(BUTTON1);
-    
+
     LCDCommand(LCD_CLEAR_CMD);
-    LCDMessage(LINE1_START_ADDR, B0 Start); 
+    LCDMessage(LINE1_START_ADDR, "B0 Start");
     
     UserApp1_StateMachine=UserApp1SM_Seeker;
   }
   
   
   
+  
+}
+
+
+
+
+static void UserApp1SM_Hider(void)
+{
   
 }
   /*-------------------------------------------------------------------------------------------------------------------*/
@@ -253,6 +268,7 @@ static void UserApp1SM_Seeker(void)
   static u16 u16Counter=10000;
   static bool bCountdown=FALSE;
 
+  
   /* Look for BUTTON 0 to open channel */
   if(WasButtonPressed(BUTTON0))
   {
@@ -349,7 +365,7 @@ static void UserApp1SM_WaitChannelOpen(void)
   {
     AntCloseChannelNumber(ANT_CHANNEL_USERAPP);
 
-    UserApp1_StateMachine = UserApp1SM_Idle;
+    UserApp1_StateMachine = UserApp1SM_Assignrole;
   }
     
 } /* end UserApp1SM_WaitChannelOpen() */
@@ -363,6 +379,7 @@ static void UserApp1SM_ChannelOpen(void)
   static u8 au8Temp[]={'-',1,1,'d','B','m','\0'};
   static u8 u8Temp;
   static bool bFound=FALSE;
+  static bool bLedBlink=FALSE;
   /* Check for BUTTON0 to close channel */
   if(WasButtonPressed(BUTTON0))
   {
@@ -393,7 +410,7 @@ static void UserApp1SM_ChannelOpen(void)
     au8Temp[2] = u8Temp%10 + 48;
     LCDMessage(LINE1_END_ADDR-6, au8Temp);
     
-    if(bFound=FALSE)
+    if(bFound==FALSE)
     {
       if(s8RssiChannel0>-120&&s8RssiChannel0<-110)
       {
@@ -472,7 +489,7 @@ static void UserApp1SM_ChannelOpen(void)
         LedOn(GREEN);
         LedOff(WHITE);
       }
-      if(s8RssiChannel0>-50&&s8RssiChannel0<-40)
+      if(s8RssiChannel0>-50&&s8RssiChannel0<-45)
       {
         LedOn(ORANGE);
         LedOn(RED);
@@ -484,7 +501,7 @@ static void UserApp1SM_ChannelOpen(void)
         LedOn(WHITE);
         
       }
-      if(s8RssiChannel0==40)
+      if(s8RssiChannel0>=-45)
       {
         LedOff(ORANGE);
         LedOff(RED);
@@ -500,18 +517,19 @@ static void UserApp1SM_ChannelOpen(void)
     }
     if(bFound)
     {
-      LedBlink(ORANGE,LED_2HZ);
-      LedBlink(RED,LED_2HZ);
-      LedBlink(PURPLE,LED_2HZ);
-      LedBlink(CYAN,LED_2HZ);
-      LedBlink(RED,LED_2HZ);
-      LedBlink(BLUE,LED_2HZ);
-      LedBlink(GREEN,LED_2HZ);
-      LedBlink(WHITE,LED_2HZ);
-      
+  
+      LedBlink(ORANGE, LED_2HZ);
+      LedBlink(RED, LED_2HZ);
+      LedBlink(PURPLE, LED_2HZ);
+      LedBlink(CYAN, LED_2HZ);
+      LedBlink(RED, LED_2HZ);
+      LedBlink(BLUE, LED_2HZ);
+      LedBlink(GREEN, LED_2HZ);
+      LedBlink(WHITE, LED_2HZ);
+      LCDMessage(LINE2_START_ADDR, "I Found You!");
     }
     
-    
+
     
     
     
@@ -543,7 +561,7 @@ static void UserApp1SM_WaitChannelClose(void)
     LedOn(GREEN0);
     LedOn(RED0);
 #endif /* MPG2 */
-    UserApp1_StateMachine = UserApp1SM_Idle;
+    UserApp1_StateMachine = UserApp1SM_Assignrole;
   }
   
   /* Check for timeout */
