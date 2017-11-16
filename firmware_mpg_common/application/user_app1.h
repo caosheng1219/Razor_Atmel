@@ -79,7 +79,9 @@ static void UserApp1SM_Seeker(void);
 static void UserApp1SM_Error(void);         
 static void UserApp1SM_FailedInit(void);        
 static void UserApp1SM_Hider(void);
-static void AntGetdBmAscii(s8 s8Data);
+
+static void UserApp1SM_ChannelOpen2(void);
+static void UserApp1SM_SeekerFound(void);
 #endif /* __USER_APP_H */
 
 

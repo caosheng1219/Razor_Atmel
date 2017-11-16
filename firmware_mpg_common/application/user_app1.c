@@ -226,9 +226,6 @@ static void UserApp1SM_WaitChannelAssign(void)
 static void UserApp1SM_Assignrole(void)
 {
 
-
-
-
   if(WasButtonPressed(BUTTON0))
   {
     ButtonAcknowledge(BUTTON0);
@@ -249,9 +246,6 @@ static void UserApp1SM_Assignrole(void)
     UserApp1_StateMachine=UserApp1SM_Seeker;
   }
   
-  
-  
-  
 }
 
 
@@ -259,7 +253,87 @@ static void UserApp1SM_Assignrole(void)
 
 static void UserApp1SM_Hider(void)
 {
+  static u16 u16Counter=10000;
+  static bool bCountdown=FALSE;
+
   
+  /* Look for BUTTON 0 to open channel */
+  if(WasButtonPressed(BUTTON0))
+  {
+    /* Got the button, so complete one-time actions before next state */
+    ButtonAcknowledge(BUTTON0);
+    bCountdown=TRUE;
+    LCDCommand(LCD_CLEAR_CMD);
+  }
+  
+  if(bCountdown)
+  {
+    u16Counter--;
+    if(u16Counter==9000)
+    {
+      LCDMessage(LINE1_START_ADDR, "Hider            "); 
+      LCDMessage(LINE2_START_ADDR, "9");
+    }
+    
+    if(u16Counter==8000)
+    {
+      LCDMessage(LINE1_START_ADDR, "Hider            "); 
+      LCDMessage(LINE2_START_ADDR, "8");
+    }
+    
+    if(u16Counter==7000)
+    {
+      LCDMessage(LINE1_START_ADDR, "Hider            "); 
+      LCDMessage(LINE2_START_ADDR, "7");
+    }
+    
+    if(u16Counter==6000)
+    {
+      LCDMessage(LINE1_START_ADDR, "Hider            "); 
+      LCDMessage(LINE2_START_ADDR, "6");
+    }
+    
+    if(u16Counter==5000)
+    {
+      LCDMessage(LINE1_START_ADDR, "Hider            "); 
+      LCDMessage(LINE2_START_ADDR, "5");
+    }
+    
+    if(u16Counter==4000)
+    {
+      LCDMessage(LINE1_START_ADDR, "Hider            "); 
+      LCDMessage(LINE2_START_ADDR, "4");
+    }
+    
+    if(u16Counter==3000)
+    {
+      LCDMessage(LINE1_START_ADDR, "Hider            "); 
+      LCDMessage(LINE2_START_ADDR, "3");
+    }
+
+    if(u16Counter==2000)
+    {
+      LCDMessage(LINE1_START_ADDR, "Hider            "); 
+      LCDMessage(LINE2_START_ADDR, "2");
+    }
+    
+    if(u16Counter==1000)
+    {
+      LCDMessage(LINE1_START_ADDR, "Hider            "); 
+      LCDMessage(LINE2_START_ADDR, "1");
+    }
+    
+    if(u16Counter==0)
+    {     
+      LCDMessage(LINE1_START_ADDR, "Come Catch Me  "); 
+      LCDMessage(LINE2_START_ADDR, "HAHAHAHAHA!");
+      AntOpenChannelNumber(ANT_CHANNEL_USERAPP);
+      bCountdown=FALSE;
+
+      UserApp1_StateMachine = UserApp1SM_ChannelOpen2;
+    }
+
+  }
 }
   /*-------------------------------------------------------------------------------------------------------------------*/
 /* Wait for a message to be queued */
@@ -289,49 +363,49 @@ static void UserApp1SM_Seeker(void)
     
     if(u16Counter==8000)
     {
-      LCDMessage(LINE1_START_ADDR, "Seeker            "); 
+       
       LCDMessage(LINE2_START_ADDR, "8");
     }
     
     if(u16Counter==7000)
     {
-      LCDMessage(LINE1_START_ADDR, "Seeker            "); 
+      
       LCDMessage(LINE2_START_ADDR, "7");
     }
     
     if(u16Counter==6000)
     {
-      LCDMessage(LINE1_START_ADDR, "Seeker            "); 
+      
       LCDMessage(LINE2_START_ADDR, "6");
     }
     
     if(u16Counter==5000)
     {
-      LCDMessage(LINE1_START_ADDR, "Seeker            "); 
+      
       LCDMessage(LINE2_START_ADDR, "5");
     }
     
     if(u16Counter==4000)
     {
-      LCDMessage(LINE1_START_ADDR, "Seeker            "); 
+      
       LCDMessage(LINE2_START_ADDR, "4");
     }
     
     if(u16Counter==3000)
     {
-      LCDMessage(LINE1_START_ADDR, "Seeker            "); 
+      
       LCDMessage(LINE2_START_ADDR, "3");
     }
 
     if(u16Counter==2000)
     {
-      LCDMessage(LINE1_START_ADDR, "Seeker            "); 
+      
       LCDMessage(LINE2_START_ADDR, "2");
     }
     
     if(u16Counter==1000)
     {
-      LCDMessage(LINE1_START_ADDR, "Seeker            "); 
+      
       LCDMessage(LINE2_START_ADDR, "1");
     }
     
@@ -339,6 +413,7 @@ static void UserApp1SM_Seeker(void)
     {     
       LCDMessage(LINE1_START_ADDR, "Ready or not  "); 
       LCDMessage(LINE2_START_ADDR, "Here I come!");
+      
       AntOpenChannelNumber(ANT_CHANNEL_USERAPP);
       bCountdown=FALSE;
 
@@ -375,11 +450,12 @@ static void UserApp1SM_WaitChannelOpen(void)
 /* Channel is open, so monitor data */
 static void UserApp1SM_ChannelOpen(void)
 {
-  static s8 s8RssiChannel0;
+  static s8 s8RssiChannel0=-120;
   static u8 au8Temp[]={'-',1,1,'d','B','m','\0'};
   static u8 u8Temp;
   static bool bFound=FALSE;
-  static bool bLedBlink=FALSE;
+
+  G_sAntApiCurrentMessageExtData.s8RSSI=-120;
   /* Check for BUTTON0 to close channel */
   if(WasButtonPressed(BUTTON0))
   {
@@ -395,23 +471,24 @@ static void UserApp1SM_ChannelOpen(void)
 
 
   
-  /* Always check for ANT messages */
-  if( AntReadAppMessageBuffer() )
+    /* Always check for ANT messages */
+  if(bFound==FALSE)
   {
-     /* New data message: check what it is */
-    if(G_eAntApiCurrentMessageClass == ANT_DATA)
+    if( AntReadAppMessageBuffer() )
     {
-      s8RssiChannel0 = G_sAntApiCurrentMessageExtData.s8RSSI;
-    }
+      /* New data message: check what it is */
+      if(G_eAntApiCurrentMessageClass == ANT_DATA)
+      {
+        s8RssiChannel0 = G_sAntApiCurrentMessageExtData.s8RSSI;
+      }
 
-    s8RssiChannel0 = G_sAntApiCurrentMessageExtData.s8RSSI;
-    u8Temp = abs(s8RssiChannel0);
-    au8Temp[1] = u8Temp/10 + 48;
-    au8Temp[2] = u8Temp%10 + 48;
-    LCDMessage(LINE1_END_ADDR-6, au8Temp);
+
+      u8Temp = abs(s8RssiChannel0);
+      au8Temp[1] = u8Temp/10 + 48;
+      au8Temp[2] = u8Temp%10 + 48;
+      LCDMessage(LINE1_END_ADDR-6, au8Temp);
     
-    if(bFound==FALSE)
-    {
+
       if(s8RssiChannel0>-120&&s8RssiChannel0<-110)
       {
         LedOn(ORANGE);
@@ -511,40 +588,173 @@ static void UserApp1SM_ChannelOpen(void)
         LedOff(BLUE);
         LedOff(GREEN);
         LedOff(WHITE);
-        bFound=TRUE;
-    
+        LCDMessage(LINE1_START_ADDR, "I Found You!");
+        LCDMessage(LINE2_START_ADDR, "10 seconds switch");
+        UserApp1_StateMachine = UserApp1SM_SeekerFound;
       }
     }
-    if(bFound)
-    {
-  
-      LedBlink(ORANGE, LED_2HZ);
-      LedBlink(RED, LED_2HZ);
-      LedBlink(PURPLE, LED_2HZ);
-      LedBlink(CYAN, LED_2HZ);
-      LedBlink(RED, LED_2HZ);
-      LedBlink(BLUE, LED_2HZ);
-      LedBlink(GREEN, LED_2HZ);
-      LedBlink(WHITE, LED_2HZ);
-      LCDMessage(LINE2_START_ADDR, "I Found You!");
-    }
-    
 
-    
-    
-    
-    
-    
-    
-    
     
     
   }
   
-      
+  
+            
 } /* end UserApp1SM_ChannelOpen() */
 
+static void UserApp1SM_ChannelOpen2(void)
+{
+  static s8 s8RssiChannel01=-120;
+  static u8 au8Temp[]={'-',1,1,'d','B','m','\0'};
+  static u8 u8Temp;
+  static bool bFound1=FALSE;
 
+  G_sAntApiCurrentMessageExtData.s8RSSI=-120;
+  /* Check for BUTTON0 to close channel */
+  if(WasButtonPressed(BUTTON0))
+  {
+    /* Got the button, so complete one-time actions before next state */
+    ButtonAcknowledge(BUTTON0);
+    
+    /* Queue close channel and change LED to blinking green to indicate channel is closing */
+    AntCloseChannelNumber(ANT_CHANNEL_USERAPP);
+
+
+    UserApp1_StateMachine = UserApp1SM_WaitChannelOpen;
+  }
+
+
+  
+    /* Always check for ANT messages */
+  if(bFound1==FALSE)
+  {
+    if( AntReadAppMessageBuffer() )
+    {
+      /* New data message: check what it is */
+      if(G_eAntApiCurrentMessageClass == ANT_DATA)
+      {
+        s8RssiChannel01 = G_sAntApiCurrentMessageExtData.s8RSSI;
+      }
+
+
+      u8Temp = abs(s8RssiChannel01);
+      au8Temp[1] = u8Temp/10 + 48;
+      au8Temp[2] = u8Temp%10 + 48;
+      LCDMessage(LINE1_END_ADDR-6, au8Temp);
+    
+
+      if(s8RssiChannel01>-120&&s8RssiChannel01<-110)
+      {
+        LedOn(ORANGE);
+        LedOff(RED);
+        LedOff(PURPLE);
+        LedOff(CYAN);
+        LedOff(RED);
+        LedOff(BLUE);
+        LedOff(GREEN);
+        LedOff(WHITE);
+      }
+      if(s8RssiChannel01>-110&&s8RssiChannel01<-100)
+      {
+        LedOn(ORANGE);
+        LedOn(RED);
+        LedOff(PURPLE);
+        LedOff(CYAN);
+        LedOff(RED);
+        LedOff(BLUE);
+        LedOff(GREEN);
+        LedOff(WHITE);
+      }
+      if(s8RssiChannel01>-100&&s8RssiChannel01<-90)
+      {
+        LedOn(ORANGE);
+        LedOn(RED);
+        LedOn(PURPLE);
+        LedOff(CYAN);
+        LedOff(RED);
+        LedOff(BLUE);
+        LedOff(GREEN);
+        LedOff(WHITE);
+      }
+      if(s8RssiChannel01>-90&&s8RssiChannel01<-80)
+      {
+        LedOn(ORANGE);
+        LedOn(RED);
+        LedOn(PURPLE);
+        LedOn(CYAN);
+        LedOff(RED);
+        LedOff(BLUE);
+        LedOff(GREEN);
+        LedOff(WHITE);
+      }
+      if(s8RssiChannel01>-80&&s8RssiChannel01<-70)
+      {
+        LedOn(ORANGE);
+        LedOn(RED);
+        LedOn(PURPLE);
+        LedOn(CYAN);
+        LedOn(RED);
+        LedOff(BLUE);
+        LedOff(GREEN);
+        LedOff(WHITE);
+      }
+      if(s8RssiChannel01>-70&&s8RssiChannel01<-60)
+      {
+        LedOn(ORANGE);
+        LedOn(RED);
+        LedOn(PURPLE);
+        LedOn(CYAN);
+        LedOn(RED);
+        LedOn(BLUE);
+        LedOff(GREEN);
+        LedOff(WHITE);
+      }
+      if(s8RssiChannel01>-60&&s8RssiChannel01<-50)
+      {
+        LedOn(ORANGE);
+        LedOn(RED);
+        LedOn(PURPLE);
+        LedOn(CYAN);
+        LedOn(RED);
+        LedOn(BLUE);
+        LedOn(GREEN);
+        LedOff(WHITE);
+      }
+      if(s8RssiChannel01>-50&&s8RssiChannel01<-45)
+      {
+        LedOn(ORANGE);
+        LedOn(RED);
+        LedOn(PURPLE);
+        LedOn(CYAN);
+        LedOn(RED);
+        LedOn(BLUE);
+        LedOn(GREEN);
+        LedOn(WHITE);
+        
+      }
+      if(s8RssiChannel01>=-45)
+      {
+        LedOff(ORANGE);
+        LedOff(RED);
+        LedOff(PURPLE);
+        LedOff(CYAN);
+        LedOff(RED);
+        LedOff(BLUE);
+        LedOff(GREEN);
+        LedOff(WHITE);
+        LCDMessage(LINE1_START_ADDR, "You Found Me!");
+        LCDMessage(LINE2_START_ADDR, "10 seconds switch");
+        UserApp1_StateMachine = UserApp1SM_SeekerFound;
+      }
+    }
+
+    
+    
+  }
+  
+  
+       
+}
 /*-------------------------------------------------------------------------------------------------------------------*/
 /* Wait for channel to close */
 static void UserApp1SM_WaitChannelClose(void)
@@ -591,17 +801,44 @@ static void UserApp1SM_Error(void)
 
 } /* end UserApp1SM_Error() */
 
-static void AntGetdBmAscii(s8 s8Data)
-{
-	static u8 u8aTemp[]={'-',1,1,'d','B','m','\0'};
-	
-	u8 temp=abs(s8Data);
-	u8aTemp[1]=temp/10+48;
-	u8aTemp[2]=temp%10+48;
-	LCDMessage(LINE1_START_ADDR+14,u8aTemp);
+
+
+static void UserApp1SM_SeekerFound(void)
+{    
+  static u16 u16Counter2=10000;
+  u8 au8WelcomeMessage[] = "Assign your role";
+  u8 au8Instructions[] = "B0 Hider  B1 Seeker";
+  
+  LedBlink(ORANGE, LED_2HZ);
+  LedBlink(RED, LED_2HZ);
+  LedBlink(PURPLE, LED_2HZ);
+  LedBlink(CYAN, LED_2HZ);
+  LedBlink(RED, LED_2HZ);
+  LedBlink(BLUE, LED_2HZ);
+  LedBlink(GREEN, LED_2HZ);
+  LedBlink(WHITE, LED_2HZ);
+
+    
+  u16Counter2--;
+
+  if(u16Counter2==0)
+  {
+    LedOff(ORANGE);
+    LedOff(RED);
+    LedOff(PURPLE);
+    LedOff(CYAN);
+    LedOff(RED);
+    LedOff(BLUE);
+    LedOff(GREEN);
+    LedOff(WHITE);    
+    LCDCommand(LCD_CLEAR_CMD);
+    LCDMessage(LINE1_START_ADDR, au8WelcomeMessage); 
+    LCDMessage(LINE2_START_ADDR, au8Instructions); 
+    UserApp1_StateMachine = UserApp1SM_Assignrole;
+    u16Counter2=10000;
+  }
+
 }
-
-
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 /* End of File                                                                                                        */
