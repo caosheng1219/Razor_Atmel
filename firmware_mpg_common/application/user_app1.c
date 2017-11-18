@@ -483,7 +483,7 @@ static void UserApp1SM_WaitChannelOpen(void)
 /* Channel is open, so monitor data */
 static void UserApp1SM_ChannelOpen(void)
 {
-  static s8 s8RssiChannel0=-120;
+  static s8 s8RssiChannel0=-99;
   static u8 au8Temp[]={'-',1,1,'d','B','m','\0'};
   static u8 u8Temp;
   static bool bFound=FALSE;
@@ -671,8 +671,8 @@ static void UserApp1SM_ChannelOpen2(void)
       {
         if(G_sAntApiCurrentMessageExtData.u8Channel == 0)
         {
-          
-          s8RssiChannel01 = G_sAntApiCurrentMessageExtData.s8RSSI;
+          s8RssiChannel01=G_au8AntApiCurrentMessageBytes[7];
+          //s8RssiChannel01 = G_sAntApiCurrentMessageExtData.s8RSSI;
         }
       }
 
