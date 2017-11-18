@@ -69,7 +69,10 @@ static u32 UserApp1_u32TickMsgCount = 0;             /* Counts the number of ANT
 static fnCode_type UserApp1_StateMachine;            /* The state machine function pointer */
 static u32 UserApp1_u32Timeout;                      /* Timeout counter used across states */
 
+static u8 UserApp1_au8MasterName[9]   = "0\0\0\0\0\0\0\0";
 
+static AntAssignChannelInfoType sMasterChannel;
+static AntAssignChannelInfoType sSlaveChannel;
 /**********************************************************************************************************************
 Function Definitions
 **********************************************************************************************************************/
@@ -99,8 +102,8 @@ void UserApp1Initialize(void)
 {
   u8 au8WelcomeMessage[] = "Assign your role";
   u8 au8Instructions[] = "B0 Hider  B1 Seeker";
-  AntAssignChannelInfoType sAntSetupData;
-  
+
+
   /* Clear screen and place start messages */
 #ifdef EIE1
   LCDCommand(LCD_CLEAR_CMD);
@@ -124,26 +127,42 @@ void UserApp1Initialize(void)
 
   
  /* Configure ANT for this application */
-  sAntSetupData.AntChannel          = ANT_CHANNEL_USERAPP;
-  sAntSetupData.AntChannelType      = ANT_CHANNEL_TYPE_USERAPP;
-  sAntSetupData.AntChannelPeriodLo  = ANT_CHANNEL_PERIOD_LO_USERAPP;
-  sAntSetupData.AntChannelPeriodHi  = ANT_CHANNEL_PERIOD_HI_USERAPP;
+  sMasterChannel.AntChannel          = ANT_CHANNEL_0;
+  sMasterChannel.AntChannelType      = CHANNEL_TYPE_MASTER;
+  sMasterChannel.AntChannelPeriodLo  = ANT_CHANNEL_PERIOD_LO_USERAPP;
+  sMasterChannel.AntChannelPeriodHi  = ANT_CHANNEL_PERIOD_HI_USERAPP;
   
-  sAntSetupData.AntDeviceIdLo       = ANT_DEVICEID_LO_USERAPP;
-  sAntSetupData.AntDeviceIdHi       = ANT_DEVICEID_HI_USERAPP;
-  sAntSetupData.AntDeviceType       = ANT_DEVICE_TYPE_USERAPP;
-  sAntSetupData.AntTransmissionType = ANT_TRANSMISSION_TYPE_USERAPP;
-  sAntSetupData.AntFrequency        = ANT_FREQUENCY_USERAPP;
-  sAntSetupData.AntTxPower          = ANT_TX_POWER_USERAPP;
+  sMasterChannel.AntDeviceIdLo       = ANT_DEVICEID_LO_USERAPP;
+  sMasterChannel.AntDeviceIdHi       = ANT_DEVICEID_HI_USERAPP;
+  sMasterChannel.AntDeviceType       = ANT_DEVICE_TYPE_USERAPP;
+  sMasterChannel.AntTransmissionType = ANT_TRANSMISSION_TYPE_USERAPP;
+  sMasterChannel.AntFrequency        = ANT_FREQUENCY_USERAPP;
+  sMasterChannel.AntTxPower          = ANT_TX_POWER_USERAPP;
 
-  sAntSetupData.AntNetwork = ANT_NETWORK_DEFAULT;
+  sMasterChannel.AntNetwork          = ANT_NETWORK_DEFAULT;
+  
+  sSlaveChannel.AntChannel           = ANT_CHANNEL_1;
+  sSlaveChannel.AntChannelType       = CHANNEL_TYPE_SLAVE;
+  sSlaveChannel.AntChannelPeriodHi   = ANT_CHANNEL_PERIOD_HI_DEFAULT;
+  sSlaveChannel.AntChannelPeriodLo   = ANT_CHANNEL_PERIOD_LO_DEFAULT;
+  
+  sSlaveChannel.AntDeviceIdLo       = ANT_DEVICEID_LO_USERAPP;
+  sSlaveChannel.AntDeviceIdHi       = ANT_DEVICEID_HI_USERAPP;
+  sSlaveChannel.AntDeviceType       = ANT_DEVICE_TYPE_USERAPP;
+  sSlaveChannel.AntTransmissionType = ANT_TRANSMISSION_TYPE_USERAPP;
+  sSlaveChannel.AntFrequency        = ANT_FREQUENCY_USERAPP;
+  sSlaveChannel.AntTxPower          = ANT_TX_POWER_USERAPP;
+  
+  sSlaveChannel.AntNetwork          = ANT_NETWORK_DEFAULT;
+  
   for(u8 i = 0; i < ANT_NETWORK_NUMBER_BYTES; i++)
   {
-    sAntSetupData.AntNetworkKey[i] = ANT_DEFAULT_NETWORK_KEY;
+    sMasterChannel.AntNetworkKey[i] = ANT_DEFAULT_NETWORK_KEY;
+    sSlaveChannel.AntNetworkKey[i] = ANT_DEFAULT_NETWORK_KEY;
   }
     
   /* If good initialization, set state to Idle */
-  if( AntAssignChannel(&sAntSetupData) )
+  if( AntAssignChannel(&sMasterChannel) )
   {
     /* Channel assignment is queued so start timer */
 #ifdef EIE1
@@ -209,9 +228,10 @@ State Machine Function Definitions
 static void UserApp1SM_WaitChannelAssign(void)
 {
   /* Check if the channel assignment is complete */
-  if(AntRadioStatusChannel(ANT_CHANNEL_USERAPP) == ANT_CONFIGURED)
+  if(AntRadioStatusChannel(ANT_CHANNEL_0) == ANT_CONFIGURED)
   {
-    UserApp1_StateMachine = UserApp1SM_Assignrole;
+    AntAssignChannel(&sSlaveChannel);
+    UserApp1_StateMachine = UserApp1SM_AntConfigureSlave;
   }
   
   /* Monitor for timeout */
@@ -222,6 +242,19 @@ static void UserApp1SM_WaitChannelAssign(void)
   }
       
 } /* end UserApp1SM_WaitChannelAssign() */
+
+static void UserApp1SM_AntConfigureSlave(void)
+{
+  if(AntRadioStatusChannel(ANT_CHANNEL_1) == ANT_CONFIGURED)
+  {
+    AntQueueBroadcastMessage(ANT_CHANNEL_0, UserApp1_au8MasterName);
+    AntQueueBroadcastMessage(ANT_CHANNEL_1, UserApp1_au8MasterName);
+       
+    UserApp1_StateMachine = UserApp1SM_Assignrole;
+  }
+}
+
+
 
 static void UserApp1SM_Assignrole(void)
 {
@@ -327,7 +360,7 @@ static void UserApp1SM_Hider(void)
     {     
       LCDMessage(LINE1_START_ADDR, "Come Catch Me  "); 
       LCDMessage(LINE2_START_ADDR, "HAHAHAHAHA!");
-      AntOpenChannelNumber(ANT_CHANNEL_USERAPP);
+      AntOpenChannelNumber(ANT_CHANNEL_0);
       bCountdown=FALSE;
 
       UserApp1_StateMachine = UserApp1SM_ChannelOpen2;
@@ -414,7 +447,7 @@ static void UserApp1SM_Seeker(void)
       LCDMessage(LINE1_START_ADDR, "Ready or not  "); 
       LCDMessage(LINE2_START_ADDR, "Here I come!");
       
-      AntOpenChannelNumber(ANT_CHANNEL_USERAPP);
+      AntOpenChannelNumber(ANT_CHANNEL_1);
       bCountdown=FALSE;
 
       UserApp1_StateMachine = UserApp1SM_ChannelOpen;
@@ -455,7 +488,7 @@ static void UserApp1SM_ChannelOpen(void)
   static u8 u8Temp;
   static bool bFound=FALSE;
 
-  G_sAntApiCurrentMessageExtData.s8RSSI=-120;
+
   /* Check for BUTTON0 to close channel */
   if(WasButtonPressed(BUTTON0))
   {
@@ -479,7 +512,10 @@ static void UserApp1SM_ChannelOpen(void)
       /* New data message: check what it is */
       if(G_eAntApiCurrentMessageClass == ANT_DATA)
       {
-        s8RssiChannel0 = G_sAntApiCurrentMessageExtData.s8RSSI;
+        if(G_sAntApiCurrentMessageExtData.u8Channel == 1)
+        {
+          s8RssiChannel0 = G_sAntApiCurrentMessageExtData.s8RSSI;
+        }
       }
 
 
@@ -604,12 +640,12 @@ static void UserApp1SM_ChannelOpen(void)
 
 static void UserApp1SM_ChannelOpen2(void)
 {
-  static s8 s8RssiChannel01=-120;
+  static s8 s8RssiChannel01=-90;
   static u8 au8Temp[]={'-',1,1,'d','B','m','\0'};
   static u8 u8Temp;
   static bool bFound1=FALSE;
 
-  G_sAntApiCurrentMessageExtData.s8RSSI=-120;
+
   /* Check for BUTTON0 to close channel */
   if(WasButtonPressed(BUTTON0))
   {
@@ -633,7 +669,11 @@ static void UserApp1SM_ChannelOpen2(void)
       /* New data message: check what it is */
       if(G_eAntApiCurrentMessageClass == ANT_DATA)
       {
-        s8RssiChannel01 = G_sAntApiCurrentMessageExtData.s8RSSI;
+        if(G_sAntApiCurrentMessageExtData.u8Channel == 0)
+        {
+          
+          s8RssiChannel01 = G_sAntApiCurrentMessageExtData.s8RSSI;
+        }
       }
 
 
@@ -808,15 +848,20 @@ static void UserApp1SM_SeekerFound(void)
   static u16 u16Counter2=10000;
   u8 au8WelcomeMessage[] = "Assign your role";
   u8 au8Instructions[] = "B0 Hider  B1 Seeker";
+  static bool bLEDFlag=FALSE;
   
-  LedBlink(ORANGE, LED_2HZ);
-  LedBlink(RED, LED_2HZ);
-  LedBlink(PURPLE, LED_2HZ);
-  LedBlink(CYAN, LED_2HZ);
-  LedBlink(RED, LED_2HZ);
-  LedBlink(BLUE, LED_2HZ);
-  LedBlink(GREEN, LED_2HZ);
-  LedBlink(WHITE, LED_2HZ);
+  if(!bLEDFlag)
+  {
+    LedBlink(ORANGE, LED_2HZ);
+    LedBlink(RED, LED_2HZ);
+    LedBlink(PURPLE, LED_2HZ);
+    LedBlink(CYAN, LED_2HZ);
+    LedBlink(RED, LED_2HZ);
+    LedBlink(BLUE, LED_2HZ);
+    LedBlink(GREEN, LED_2HZ);
+    LedBlink(WHITE, LED_2HZ);
+    bLEDFlag=TRUE;
+  }
 
     
   u16Counter2--;
@@ -836,6 +881,7 @@ static void UserApp1SM_SeekerFound(void)
     LCDMessage(LINE2_START_ADDR, au8Instructions); 
     UserApp1_StateMachine = UserApp1SM_Assignrole;
     u16Counter2=10000;
+    bLEDFlag=FALSE;
   }
 
 }

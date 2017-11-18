@@ -9,7 +9,7 @@ TriggerName=main
 LimitSize=0
 ByteLimit=50
 [DebugChecksum]
-Checksum=2037884426
+Checksum=1064815649
 [JLinkDriver]
 CStepIntDis=_ 0
 WatchCond=_ 0
@@ -51,8 +51,9 @@ Fmt0=u8[20]	3	0
 Fmt1=u8[7]	3	0
 [watch_formats]
 Fmt0={W}3:s8RssiChannel0	3	0
-Fmt1={W}3:u16Counter	3	0
-Fmt2={W}3:u8Countdown	3	0
+Fmt1={W}3:s8RssiChannel01	3	0
+Fmt2={W}3:u16Counter	3	0
+Fmt3={W}3:u8Countdown	3	0
 [Log file]
 LoggingEnabled=_ 0
 LogFile=_ ""

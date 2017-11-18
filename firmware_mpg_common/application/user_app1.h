@@ -79,7 +79,7 @@ static void UserApp1SM_Seeker(void);
 static void UserApp1SM_Error(void);         
 static void UserApp1SM_FailedInit(void);        
 static void UserApp1SM_Hider(void);
-
+static void UserApp1SM_AntConfigureSlave(void);
 static void UserApp1SM_ChannelOpen2(void);
 static void UserApp1SM_SeekerFound(void);
 #endif /* __USER_APP_H */
