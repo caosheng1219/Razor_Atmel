@@ -146,8 +146,8 @@ void UserApp1Initialize(void)
   sSlaveChannel.AntChannelPeriodHi   = ANT_CHANNEL_PERIOD_HI_DEFAULT;
   sSlaveChannel.AntChannelPeriodLo   = ANT_CHANNEL_PERIOD_LO_DEFAULT;
   
-  sSlaveChannel.AntDeviceIdLo       = ANT_DEVICEID_LO_USERAPP;
-  sSlaveChannel.AntDeviceIdHi       = ANT_DEVICEID_HI_USERAPP;
+  sSlaveChannel.AntDeviceIdLo       = 0x3C;
+  sSlaveChannel.AntDeviceIdHi       = 0x14;
   sSlaveChannel.AntDeviceType       = ANT_DEVICE_TYPE_USERAPP;
   sSlaveChannel.AntTransmissionType = ANT_TRANSMISSION_TYPE_USERAPP;
   sSlaveChannel.AntFrequency        = ANT_FREQUENCY_USERAPP;
@@ -165,28 +165,20 @@ void UserApp1Initialize(void)
   if( AntAssignChannel(&sMasterChannel) )
   {
     /* Channel assignment is queued so start timer */
-#ifdef EIE1
+
     UserApp1_u32Timeout = G_u32SystemTime1ms;
     LedOn(RED);
-#endif /* EIE1 */
     
-#ifdef MPG2
-    LedOn(RED0);
-#endif /* MPG2 */
     
     UserApp1_StateMachine = UserApp1SM_WaitChannelAssign;
   }
   else
   {
     /* The task isn't properly initialized, so shut it down and don't run */
-#ifdef EIE1
-    LedBlink(RED, LED_4HZ);
-#endif /* EIE1 */
-    
-#ifdef MPG2
-    LedBlink(RED0, LED_4HZ);
-#endif /* MPG2 */
 
+    LedBlink(RED, LED_4HZ);
+
+    
     UserApp1_StateMachine = UserApp1SM_Error;
   }
 
@@ -288,6 +280,7 @@ static void UserApp1SM_Hider(void)
 {
   static u16 u16Counter=10000;
   static bool bCountdown=FALSE;
+//  static bool bSend = FALSE;
 
   
   /* Look for BUTTON 0 to open channel */
@@ -296,8 +289,30 @@ static void UserApp1SM_Hider(void)
     /* Got the button, so complete one-time actions before next state */
     ButtonAcknowledge(BUTTON0);
     bCountdown=TRUE;
+//    bSend=TRUE;
     LCDCommand(LCD_CLEAR_CMD);
   }
+  
+//  if(bSend)
+//  {
+//   if( AntReadAppMessageBuffer() )
+//    {
+//      /* New data message: check what it is */
+//      if(G_eAntApiCurrentMessageClass == ANT_TICK)
+//      {
+//        UserApp1_au8MasterName[6] = ANT_DEVICEID_HI_USERAPP;
+//        UserApp1_au8MasterName[7] = ANT_DEVICEID_LO_USERAPP;
+//        AntQueueBroadcastMessage(ANT_CHANNEL_0,UserApp1_au8MasterName);
+//      }
+//      else if(G_eAntApiCurrentMessageClass == ANT_DATA)
+//      {
+//        if(G_au8AntApiCurrentMessageBytes[5] == 0x01)
+//        {
+//          bCountdown=TRUE;
+//        }
+//      }
+//    }  
+//  }
   
   if(bCountdown)
   {
@@ -361,6 +376,7 @@ static void UserApp1SM_Hider(void)
       LCDMessage(LINE1_START_ADDR, "Come Catch Me  "); 
       LCDMessage(LINE2_START_ADDR, "HAHAHAHAHA!");
       AntOpenChannelNumber(ANT_CHANNEL_0);
+      AntOpenChannelNumber(ANT_CHANNEL_1);
       bCountdown=FALSE;
 
       UserApp1_StateMachine = UserApp1SM_ChannelOpen2;
@@ -374,6 +390,7 @@ static void UserApp1SM_Seeker(void)
 {
   static u16 u16Counter=10000;
   static bool bCountdown=FALSE;
+//  static bool bReceive = FALSE;
 
   
   /* Look for BUTTON 0 to open channel */
@@ -448,6 +465,7 @@ static void UserApp1SM_Seeker(void)
       LCDMessage(LINE2_START_ADDR, "Here I come!");
       
       AntOpenChannelNumber(ANT_CHANNEL_1);
+      AntOpenChannelNumber(ANT_CHANNEL_0);
       bCountdown=FALSE;
 
       UserApp1_StateMachine = UserApp1SM_ChannelOpen;
@@ -489,18 +507,18 @@ static void UserApp1SM_ChannelOpen(void)
   static bool bFound=FALSE;
 
 
-  /* Check for BUTTON0 to close channel */
-  if(WasButtonPressed(BUTTON0))
-  {
-    /* Got the button, so complete one-time actions before next state */
-    ButtonAcknowledge(BUTTON0);
-    
-    /* Queue close channel and change LED to blinking green to indicate channel is closing */
-    AntCloseChannelNumber(ANT_CHANNEL_USERAPP);
-
-
-    UserApp1_StateMachine = UserApp1SM_WaitChannelOpen;
-  }
+//  /* Check for BUTTON0 to close channel */
+//  if(WasButtonPressed(BUTTON0))
+//  {
+//    /* Got the button, so complete one-time actions before next state */
+//    ButtonAcknowledge(BUTTON0);
+//    
+//    /* Queue close channel and change LED to blinking green to indicate channel is closing */
+//    AntCloseChannelNumber(ANT_CHANNEL_USERAPP);
+//
+//
+//    UserApp1_StateMachine = UserApp1SM_WaitChannelOpen;
+//  }
 
 
   
@@ -512,12 +530,23 @@ static void UserApp1SM_ChannelOpen(void)
       /* New data message: check what it is */
       if(G_eAntApiCurrentMessageClass == ANT_DATA)
       {
-        if(G_sAntApiCurrentMessageExtData.u8Channel == 1)
+        if(G_sAntApiCurrentMessageExtData.u8Channel == 0x01)
         {
           s8RssiChannel0 = G_sAntApiCurrentMessageExtData.s8RSSI;
+          if(s8RssiChannel0 >= -55)
+          {
+            UserApp1_au8MasterName[0]=0x01;
+            
+          }
+//          else
+//          {
+//            UserApp1_au8MasterName[0]=0x00;
+//            AntQueueBroadcastMessage(ANT_CHANNEL_1,UserApp1_au8MasterName );
+//          }
         }
       }
-
+       
+      AntQueueBroadcastMessage(ANT_CHANNEL_1,UserApp1_au8MasterName );
 
       u8Temp = abs(s8RssiChannel0);
       au8Temp[1] = u8Temp/10 + 48;
@@ -580,7 +609,7 @@ static void UserApp1SM_ChannelOpen(void)
         LedOff(GREEN);
         LedOff(WHITE);
       }
-      if(s8RssiChannel0>-70&&s8RssiChannel0<-60)
+      if(s8RssiChannel0>-70&&s8RssiChannel0<-65)
       {
         LedOn(ORANGE);
         LedOn(RED);
@@ -591,7 +620,7 @@ static void UserApp1SM_ChannelOpen(void)
         LedOff(GREEN);
         LedOff(WHITE);
       }
-      if(s8RssiChannel0>-60&&s8RssiChannel0<-50)
+      if(s8RssiChannel0>-65&&s8RssiChannel0<-60)
       {
         LedOn(ORANGE);
         LedOn(RED);
@@ -602,7 +631,7 @@ static void UserApp1SM_ChannelOpen(void)
         LedOn(GREEN);
         LedOff(WHITE);
       }
-      if(s8RssiChannel0>-50&&s8RssiChannel0<-45)
+      if(s8RssiChannel0>-60&&s8RssiChannel0<-55)
       {
         LedOn(ORANGE);
         LedOn(RED);
@@ -614,7 +643,7 @@ static void UserApp1SM_ChannelOpen(void)
         LedOn(WHITE);
         
       }
-      if(s8RssiChannel0>=-45)
+      if(s8RssiChannel0>=-55)
       {
         LedOff(ORANGE);
         LedOff(RED);
@@ -626,6 +655,7 @@ static void UserApp1SM_ChannelOpen(void)
         LedOff(WHITE);
         LCDMessage(LINE1_START_ADDR, "I Found You!");
         LCDMessage(LINE2_START_ADDR, "10 seconds switch");
+        
         UserApp1_StateMachine = UserApp1SM_SeekerFound;
       }
     }
@@ -644,20 +674,20 @@ static void UserApp1SM_ChannelOpen2(void)
   static u8 au8Temp[]={'-',1,1,'d','B','m','\0'};
   static u8 u8Temp;
   static bool bFound1=FALSE;
-
-
-  /* Check for BUTTON0 to close channel */
-  if(WasButtonPressed(BUTTON0))
-  {
-    /* Got the button, so complete one-time actions before next state */
-    ButtonAcknowledge(BUTTON0);
-    
-    /* Queue close channel and change LED to blinking green to indicate channel is closing */
-    AntCloseChannelNumber(ANT_CHANNEL_USERAPP);
-
-
-    UserApp1_StateMachine = UserApp1SM_WaitChannelOpen;
-  }
+  static bool bClose = FALSE;
+//
+//  /* Check for BUTTON0 to close channel */
+//  if(WasButtonPressed(BUTTON0))
+//  {
+//    /* Got the button, so complete one-time actions before next state */
+//    ButtonAcknowledge(BUTTON0);
+//    
+//    /* Queue close channel and change LED to blinking green to indicate channel is closing */
+//    AntCloseChannelNumber(ANT_CHANNEL_USERAPP);
+//
+//
+//    UserApp1_StateMachine = UserApp1SM_WaitChannelOpen;
+//  }
 
 
   
@@ -671,7 +701,14 @@ static void UserApp1SM_ChannelOpen2(void)
       {
         if(G_sAntApiCurrentMessageExtData.u8Channel == 0)
         {
-          s8RssiChannel01=G_au8AntApiCurrentMessageBytes[7];
+          s8RssiChannel01 = G_sAntApiCurrentMessageExtData.s8RSSI;
+//          if(G_au8AntApiCurrentMessageBytes[0] == 0x01)
+//          {
+//            bClose = TRUE;
+//            
+//          }
+          
+          //s8RssiChannel01=G_au8AntApiCurrentMessageBytes[7];
           //s8RssiChannel01 = G_sAntApiCurrentMessageExtData.s8RSSI;
         }
       }
@@ -682,97 +719,97 @@ static void UserApp1SM_ChannelOpen2(void)
       au8Temp[2] = u8Temp%10 + 48;
       LCDMessage(LINE1_END_ADDR-6, au8Temp);
     
-
-      if(s8RssiChannel01>-120&&s8RssiChannel01<-110)
-      {
-        LedOn(ORANGE);
-        LedOff(RED);
-        LedOff(PURPLE);
-        LedOff(CYAN);
-        LedOff(RED);
-        LedOff(BLUE);
-        LedOff(GREEN);
-        LedOff(WHITE);
-      }
-      if(s8RssiChannel01>-110&&s8RssiChannel01<-100)
-      {
-        LedOn(ORANGE);
-        LedOn(RED);
-        LedOff(PURPLE);
-        LedOff(CYAN);
-        LedOff(RED);
-        LedOff(BLUE);
-        LedOff(GREEN);
-        LedOff(WHITE);
-      }
-      if(s8RssiChannel01>-100&&s8RssiChannel01<-90)
-      {
-        LedOn(ORANGE);
-        LedOn(RED);
-        LedOn(PURPLE);
-        LedOff(CYAN);
-        LedOff(RED);
-        LedOff(BLUE);
-        LedOff(GREEN);
-        LedOff(WHITE);
-      }
-      if(s8RssiChannel01>-90&&s8RssiChannel01<-80)
-      {
-        LedOn(ORANGE);
-        LedOn(RED);
-        LedOn(PURPLE);
-        LedOn(CYAN);
-        LedOff(RED);
-        LedOff(BLUE);
-        LedOff(GREEN);
-        LedOff(WHITE);
-      }
-      if(s8RssiChannel01>-80&&s8RssiChannel01<-70)
-      {
-        LedOn(ORANGE);
-        LedOn(RED);
-        LedOn(PURPLE);
-        LedOn(CYAN);
-        LedOn(RED);
-        LedOff(BLUE);
-        LedOff(GREEN);
-        LedOff(WHITE);
-      }
-      if(s8RssiChannel01>-70&&s8RssiChannel01<-60)
-      {
-        LedOn(ORANGE);
-        LedOn(RED);
-        LedOn(PURPLE);
-        LedOn(CYAN);
-        LedOn(RED);
-        LedOn(BLUE);
-        LedOff(GREEN);
-        LedOff(WHITE);
-      }
-      if(s8RssiChannel01>-60&&s8RssiChannel01<-50)
-      {
-        LedOn(ORANGE);
-        LedOn(RED);
-        LedOn(PURPLE);
-        LedOn(CYAN);
-        LedOn(RED);
-        LedOn(BLUE);
-        LedOn(GREEN);
-        LedOff(WHITE);
-      }
-      if(s8RssiChannel01>-50&&s8RssiChannel01<-45)
-      {
-        LedOn(ORANGE);
-        LedOn(RED);
-        LedOn(PURPLE);
-        LedOn(CYAN);
-        LedOn(RED);
-        LedOn(BLUE);
-        LedOn(GREEN);
-        LedOn(WHITE);
-        
-      }
-      if(s8RssiChannel01>=-45)
+//
+//      if(s8RssiChannel01>-120&&s8RssiChannel01<-110)
+//      {
+//        LedOn(ORANGE);
+//        LedOff(RED);
+//        LedOff(PURPLE);
+//        LedOff(CYAN);
+//        LedOff(RED);
+//        LedOff(BLUE);
+//        LedOff(GREEN);
+//        LedOff(WHITE);
+//      }
+//      if(s8RssiChannel01>-110&&s8RssiChannel01<-100)
+//      {
+//        LedOn(ORANGE);
+//        LedOn(RED);
+//        LedOff(PURPLE);
+//        LedOff(CYAN);
+//        LedOff(RED);
+//        LedOff(BLUE);
+//        LedOff(GREEN);
+//        LedOff(WHITE);
+//      }
+//      if(s8RssiChannel01>-100&&s8RssiChannel01<-90)
+//      {
+//        LedOn(ORANGE);
+//        LedOn(RED);
+//        LedOn(PURPLE);
+//        LedOff(CYAN);
+//        LedOff(RED);
+//        LedOff(BLUE);
+//        LedOff(GREEN);
+//        LedOff(WHITE);
+//      }
+//      if(s8RssiChannel01>-90&&s8RssiChannel01<-80)
+//      {
+//        LedOn(ORANGE);
+//        LedOn(RED);
+//        LedOn(PURPLE);
+//        LedOn(CYAN);
+//        LedOff(RED);
+//        LedOff(BLUE);
+//        LedOff(GREEN);
+//        LedOff(WHITE);
+//      }
+//      if(s8RssiChannel01>-80&&s8RssiChannel01<-70)
+//      {
+//        LedOn(ORANGE);
+//        LedOn(RED);
+//        LedOn(PURPLE);
+//        LedOn(CYAN);
+//        LedOn(RED);
+//        LedOff(BLUE);
+//        LedOff(GREEN);
+//        LedOff(WHITE);
+//      }
+//      if(s8RssiChannel01>-70&&s8RssiChannel01<-60)
+//      {
+//        LedOn(ORANGE);
+//        LedOn(RED);
+//        LedOn(PURPLE);
+//        LedOn(CYAN);
+//        LedOn(RED);
+//        LedOn(BLUE);
+//        LedOff(GREEN);
+//        LedOff(WHITE);
+//      }
+//      if(s8RssiChannel01>-60&&s8RssiChannel01<-50)
+//      {
+//        LedOn(ORANGE);
+//        LedOn(RED);
+//        LedOn(PURPLE);
+//        LedOn(CYAN);
+//        LedOn(RED);
+//        LedOn(BLUE);
+//        LedOn(GREEN);
+//        LedOff(WHITE);
+//      }
+//      if(s8RssiChannel01>-50&&s8RssiChannel01<-45)
+//      {
+//        LedOn(ORANGE);
+//        LedOn(RED);
+//        LedOn(PURPLE);
+//        LedOn(CYAN);
+//        LedOn(RED);
+//        LedOn(BLUE);
+//        LedOn(GREEN);
+//        LedOn(WHITE);
+//        
+//      }
+      if(s8RssiChannel01>=-55)
       {
         LedOff(ORANGE);
         LedOff(RED);
@@ -788,7 +825,6 @@ static void UserApp1SM_ChannelOpen2(void)
       }
     }
 
-    
     
   }
   
@@ -862,6 +898,7 @@ static void UserApp1SM_SeekerFound(void)
     LedBlink(WHITE, LED_2HZ);
     bLEDFlag=TRUE;
   }
+   
 
     
   u16Counter2--;
@@ -879,10 +916,13 @@ static void UserApp1SM_SeekerFound(void)
     LCDCommand(LCD_CLEAR_CMD);
     LCDMessage(LINE1_START_ADDR, au8WelcomeMessage); 
     LCDMessage(LINE2_START_ADDR, au8Instructions); 
+    AntCloseChannelNumber(ANT_CHANNEL_0);
+    AntCloseChannelNumber(ANT_CHANNEL_1);
     UserApp1_StateMachine = UserApp1SM_Assignrole;
     u16Counter2=10000;
     bLEDFlag=FALSE;
   }
+  
 
 }
 
