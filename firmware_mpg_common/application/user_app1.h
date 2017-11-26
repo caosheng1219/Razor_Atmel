@@ -31,17 +31,17 @@ Constants / Definitions
 /* Required constants for ANT channel configuration */
 #define ANT_CHANNEL_USERAPP             ANT_CHANNEL_0         /* Channel 0 - 7 */
 #define ANT_CHANNEL_TYPE_USERAPP        CHANNEL_TYPE_SLAVE    /* ANT SLAVE */
-#define ANT_DEVICEID_LO_USERAPP         (u8)0x3C                /* Low byte of two-byte Device # */
-#define ANT_DEVICEID_HI_USERAPP         (u8)0x14                /* High byte of two-byte Device # */
-#define ANT_DEVICE_TYPE_USERAPP         (u8)1                 /* 1 - 255 */
+#define ANT_DEVICEID_LO_USERAPP         (u8)0x00                /* Low byte of two-byte Device # */
+#define ANT_DEVICEID_HI_USERAPP         (u8)0x00               /* High byte of two-byte Device # */
+#define ANT_DEVICE_TYPE_USERAPP         (u8)(0x78)                /* 1 - 255 */
 #define ANT_TRANSMISSION_TYPE_USERAPP   (u8)1                 /* 1-127 (MSB is pairing bit) */
-#define ANT_CHANNEL_PERIOD_LO_USERAPP   (u8)0x00              /* Low byte of two-byte channel period 0x0001 - 0x7fff */
-#define ANT_CHANNEL_PERIOD_HI_USERAPP   (u8)0x20              /* High byte of two-byte channel period */
+#define ANT_CHANNEL_PERIOD_LO_USERAPP   (u8)0x86              /* Low byte of two-byte channel period 0x0001 - 0x7fff */
+#define ANT_CHANNEL_PERIOD_HI_USERAPP   (u8)0x1F              /* High byte of two-byte channel period */
 #define ANT_FREQUENCY_USERAPP           (u8)57                /* 2400MHz + this number 0 - 99 */
 #define ANT_TX_POWER_USERAPP            RADIO_TX_POWER_4DBM   /* RADIO_TX_POWER_0DBM, RADIO_TX_POWER_MINUS5DBM, RADIO_TX_POWER_MINUS10DBM, RADIO_TX_POWER_MINUS20DBM */
 #define WAIT_TIME                       (u8)3000
 #define TIMEOUT_VALUE                   (u32)2000             /* Maximum allowed timeout value for any transition state */
-
+#define AU8_ANT_PLUS_NETWORK_KEY        {0xB9, 0xA5, 0x21, 0xFB, 0xBD, 0x72, 0xC3, 0x45}
 /* G_u32UserAppFlags */
 #define _CHANNEL_SYNCED                 0x00000001            /* Set when channel is synced */
 
@@ -71,17 +71,12 @@ void UserApp1RunActiveState(void);
 State Machine Declarations
 ***********************************************************************************************************************/
 static void UserApp1SM_WaitChannelAssign(void);
-static void UserApp1SM_Assignrole(void);  
-static void UserApp1SM_WaitChannelOpen(void);
-static void UserApp1SM_ChannelOpen(void);
+static void UserApp1SM_Idle(void);
 static void UserApp1SM_WaitChannelClose(void);
-static void UserApp1SM_Seeker(void);
+static void UserApp1SM_ChannelOpening(void);
 static void UserApp1SM_Error(void);         
 static void UserApp1SM_FailedInit(void);        
-static void UserApp1SM_Hider(void);
-static void UserApp1SM_AntConfigureSlave(void);
-static void UserApp1SM_ChannelOpen2(void);
-static void UserApp1SM_SeekerFound(void);
+static void UserApp1SM_RadioActive(void);
 #endif /* __USER_APP_H */
 
 
