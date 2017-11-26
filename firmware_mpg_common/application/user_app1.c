@@ -71,8 +71,8 @@ static u32 UserApp1_u32Timeout;                      /* Timeout counter used acr
 
 static u8 UserApp1_au8MasterName[9]   = "0\0\0\0\0\0\0\0";
 
-static AntAssignChannelInfoType sMasterChannel;
-static AntAssignChannelInfoType sSlaveChannel;
+static AntAssignChannelInfoType sChannelInfo;
+
 /**********************************************************************************************************************
 Function Definitions
 **********************************************************************************************************************/
@@ -100,15 +100,12 @@ Promises:
 */
 void UserApp1Initialize(void)
 {
-  u8 au8WelcomeMessage[] = "Assign your role";
-  u8 au8Instructions[] = "B0 Hider  B1 Seeker";
-
 
   /* Clear screen and place start messages */
 #ifdef EIE1
   LCDCommand(LCD_CLEAR_CMD);
-  LCDMessage(LINE1_START_ADDR, au8WelcomeMessage); 
-  LCDMessage(LINE2_START_ADDR, au8Instructions); 
+  LCDMessage(LINE1_START_ADDR, "Activate HRM then");
+  LCDMessage(LINE2_START_ADDR, "press BTN0 to pair");
 
   
   
@@ -127,42 +124,29 @@ void UserApp1Initialize(void)
 
   
  /* Configure ANT for this application */
-  sMasterChannel.AntChannel          = ANT_CHANNEL_0;
-  sMasterChannel.AntChannelType      = CHANNEL_TYPE_MASTER;
-  sMasterChannel.AntChannelPeriodLo  = ANT_CHANNEL_PERIOD_LO_USERAPP;
-  sMasterChannel.AntChannelPeriodHi  = ANT_CHANNEL_PERIOD_HI_USERAPP;
+  sChannelInfo.AntChannel          = ANT_CHANNEL_0;
+  sChannelInfo.AntChannelType      = CHANNEL_TYPE_MASTER;
+  sChannelInfo.AntChannelPeriodLo  = ANT_CHANNEL_PERIOD_LO_USERAPP;
+  sChannelInfo.AntChannelPeriodHi  = ANT_CHANNEL_PERIOD_HI_USERAPP;
   
-  sMasterChannel.AntDeviceIdLo       = ANT_DEVICEID_LO_USERAPP;
-  sMasterChannel.AntDeviceIdHi       = ANT_DEVICEID_HI_USERAPP;
-  sMasterChannel.AntDeviceType       = ANT_DEVICE_TYPE_USERAPP;
-  sMasterChannel.AntTransmissionType = ANT_TRANSMISSION_TYPE_USERAPP;
-  sMasterChannel.AntFrequency        = ANT_FREQUENCY_USERAPP;
-  sMasterChannel.AntTxPower          = ANT_TX_POWER_USERAPP;
+  sChannelInfo.AntDeviceIdLo       = ANT_DEVICEID_LO_USERAPP;
+  sChannelInfo.AntDeviceIdHi       = ANT_DEVICEID_HI_USERAPP;
+  sChannelInfo.AntDeviceType       = ANT_DEVICE_TYPE_USERAPP;
+  sChannelInfo.AntTransmissionType = ANT_TRANSMISSION_TYPE_USERAPP;
+  sChannelInfo.AntFrequency        = ANT_FREQUENCY_USERAPP;
+  sChannelInfo.AntTxPower          = ANT_TX_POWER_USERAPP;
 
-  sMasterChannel.AntNetwork          = ANT_NETWORK_DEFAULT;
+  sChannelInfo.AntNetwork          = ANT_NETWORK_DEFAULT;
   
-  sSlaveChannel.AntChannel           = ANT_CHANNEL_1;
-  sSlaveChannel.AntChannelType       = CHANNEL_TYPE_SLAVE;
-  sSlaveChannel.AntChannelPeriodHi   = ANT_CHANNEL_PERIOD_HI_DEFAULT;
-  sSlaveChannel.AntChannelPeriodLo   = ANT_CHANNEL_PERIOD_LO_DEFAULT;
-  
-  sSlaveChannel.AntDeviceIdLo       = 0x00;
-  sSlaveChannel.AntDeviceIdHi       = 0x00;
-  sSlaveChannel.AntDeviceType       = ANT_DEVICE_TYPE_USERAPP;
-  sSlaveChannel.AntTransmissionType = ANT_TRANSMISSION_TYPE_USERAPP;
-  sSlaveChannel.AntFrequency        = ANT_FREQUENCY_USERAPP;
-  sSlaveChannel.AntTxPower          = ANT_TX_POWER_USERAPP;
-  
-  sSlaveChannel.AntNetwork          = ANT_NETWORK_DEFAULT;
-  
+
   for(u8 i = 0; i < ANT_NETWORK_NUMBER_BYTES; i++)
   {
-    sMasterChannel.AntNetworkKey[i] = ANT_DEFAULT_NETWORK_KEY;
-    sSlaveChannel.AntNetworkKey[i] = ANT_DEFAULT_NETWORK_KEY;
+    sChannelInfo.AntNetworkKey[i] = ANT_DEFAULT_NETWORK_KEY;
+
   }
     
   /* If good initialization, set state to Idle */
-  if( AntAssignChannel(&sMasterChannel) )
+  if( AntAssignChannel(&sChannelInfo) )
   {
     /* Channel assignment is queued so start timer */
 

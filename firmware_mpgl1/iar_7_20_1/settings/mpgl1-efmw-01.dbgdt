@@ -82,7 +82,7 @@
           
           
           
-        <item>G_u32SystemTime1ms</item><item>G_u32SystemTime1s</item><item>Ant_au8AntRxBuffer</item><item>UserApp1_StateMachine</item><item>bCountdown</item><item>bButtonPressed</item><item>s8RssiChannel01</item><item>G_sAntApiCurrentMessageExtData</item><item>u8Temp</item><item>au8Temp</item><item></item></expressions>
+        <item>G_u32SystemTime1ms</item><item>G_u32SystemTime1s</item><item>Ant_au8AntRxBuffer</item><item>UserApp1_StateMachine</item><item>bCountdown</item><item>bButtonPressed</item><item>s8RssiChannel01</item><item>G_sAntApiCurrentMessageExtData</item><item>u8Temp</item><item>au8Temp</item><item/></expressions>
         <col-names>
           
           
@@ -116,7 +116,7 @@
       <WATCH_3>
         <expressions>
           
-        <item>AntOpenChannelNumber</item><item>bFound</item><item>LedBlink</item><item>bLedBlink</item><item>u16Counter</item><item>u16Counter2</item><item>bCountdown</item><item>u16Counter</item><item>u16Counter2</item><item>bFound</item><item>bFound</item><item>UserApp1_StateMachine</item><item>G_sAntApiCurrentMessageExtData</item><item>s8RssiChannel0</item><item>s8RssiChannel01</item><item>u8Temp</item><item>AntOpenChannelNumber</item><item>s8RssiChannel01</item><item>G_sAntApiCurrentMessageExtData</item><item>s8RssiChannel01</item><item>ANT_CONFIGURED</item><item>ANT_CONFIGURED</item><item>G_au8AntApiCurrentMessageBytes</item><item>s8RssiChannel01</item><item>UserApp1_au8MasterName</item><item></item></expressions>
+        <item>AntOpenChannelNumber</item><item>bFound</item><item>LedBlink</item><item>bLedBlink</item><item>u16Counter</item><item>u16Counter2</item><item>bCountdown</item><item>u16Counter</item><item>u16Counter2</item><item>bFound</item><item>bFound</item><item>UserApp1_StateMachine</item><item>G_sAntApiCurrentMessageExtData</item><item>s8RssiChannel0</item><item>s8RssiChannel01</item><item>u8Temp</item><item>AntOpenChannelNumber</item><item>s8RssiChannel01</item><item>G_sAntApiCurrentMessageExtData</item><item>s8RssiChannel01</item><item>ANT_CONFIGURED</item><item>ANT_CONFIGURED</item><item>G_au8AntApiCurrentMessageBytes</item><item>s8RssiChannel01</item><item>UserApp1_au8MasterName</item><item/></expressions>
         <col-names>
           
           
