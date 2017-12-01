@@ -72,7 +72,8 @@ static u32 UserApp1_u32Timeout;                      /* Timeout counter used acr
 static u8 UserApp1_au8MasterName[9]   = "0\0\0\0\0\0\0\0";
 
 static AntAssignChannelInfoType sChannelInfo;
-
+static bool bInitialize=FALSE;
+static u8 u8ChangeFlag=0;
 /**********************************************************************************************************************
 Function Definitions
 **********************************************************************************************************************/
@@ -105,10 +106,11 @@ void UserApp1Initialize(void)
   /* Clear screen and place start messages */
 #ifdef EIE1
   LCDCommand(LCD_CLEAR_CMD);
-  LCDMessage(LINE1_START_ADDR, "Activate HRM then");
-  LCDMessage(LINE2_START_ADDR, "press BTN0 to pair");
+  LCDMessage(LINE1_START_ADDR, "B1 Normal B2 LoseWei");
+  LCDMessage(LINE2_START_ADDR, "B3 Find Device");
 
-  
+  PWMAudioSetFrequency(BUZZER1, 2000);
+
   
   LedOff(ORANGE);
   LedOff(RED);
@@ -206,13 +208,6 @@ static void UserApp1SM_WaitChannelAssign(void)
   /* Check if the channel assignment is complete */
   if(AntRadioStatusChannel(ANT_CHANNEL_0) == ANT_CONFIGURED)
   {
-
-    LedOn(YELLOW);
-    
-    LCDCommand(LCD_CLEAR_CMD);
-    LCDMessage(LINE1_START_ADDR, "Activate HRM then");
-    LCDMessage(LINE2_START_ADDR, "press BTN0 to pair");
-    
     UserApp1_StateMachine = UserApp1SM_Idle;
   }
   
@@ -231,7 +226,9 @@ static void UserApp1SM_WaitChannelAssign(void)
 */
 static void UserApp1SM_Idle(void)
 {
-  if(WasButtonPressed(BUTTON0))
+  bInitialize=FALSE;
+  u8ChangeFlag=0;
+  if(WasButtonPressed(BUTTON1))
   {
     LedOff(ORANGE);
     LedOff(RED);
@@ -241,10 +238,42 @@ static void UserApp1SM_Idle(void)
     LedOff(BLUE);
     LedOff(GREEN);
     LedOff(WHITE);
-    ButtonAcknowledge(BUTTON0);
+    ButtonAcknowledge(BUTTON1);
     LCDCommand(LCD_CLEAR_CMD);
     AntOpenChannelNumber(ANT_CHANNEL_USERAPP);
-    UserApp1_StateMachine = UserApp1SM_ChannelOpening;
+    UserApp1_StateMachine = UserApp1SM_ChannelOpening1;
+  }
+  
+  if(WasButtonPressed(BUTTON2))
+  {
+    LedOff(ORANGE);
+    LedOff(RED);
+    LedOff(PURPLE);
+    LedOff(CYAN);
+    LedOff(YELLOW);
+    LedOff(BLUE);
+    LedOff(GREEN);
+    LedOff(WHITE);
+    ButtonAcknowledge(BUTTON2);
+    LCDCommand(LCD_CLEAR_CMD);
+    AntOpenChannelNumber(ANT_CHANNEL_USERAPP);
+    UserApp1_StateMachine = UserApp1SM_ChannelOpening2;
+  }
+  
+  if(WasButtonPressed(BUTTON3))
+  {
+    LedOff(ORANGE);
+    LedOff(RED);
+    LedOff(PURPLE);
+    LedOff(CYAN);
+    LedOff(RED);
+    LedOff(BLUE);
+    LedOff(GREEN);
+    LedOff(WHITE);
+    ButtonAcknowledge(BUTTON3);
+    LCDCommand(LCD_CLEAR_CMD);
+    AntOpenChannelNumber(ANT_CHANNEL_USERAPP);
+    UserApp1_StateMachine = UserApp1SM_ChannelOpening3;
   }
   
 } /* end UserApp1SM_Idle() */
@@ -253,11 +282,25 @@ static void UserApp1SM_Idle(void)
 
 
 
-static void UserApp1SM_ChannelOpening(void)
+static void UserApp1SM_ChannelOpening1(void)
 {
   if(AntRadioStatusChannel(ANT_CHANNEL_USERAPP) == ANT_OPEN)
   {
-    UserApp1_StateMachine = UserApp1SM_RadioActive;
+    UserApp1_StateMachine = UserApp1SM_Mode1;
+  }
+}
+static void UserApp1SM_ChannelOpening2(void)
+{
+  if(AntRadioStatusChannel(ANT_CHANNEL_USERAPP) == ANT_OPEN)
+  {
+    UserApp1_StateMachine = UserApp1SM_Mode2;
+  }
+}
+static void UserApp1SM_ChannelOpening3(void)
+{
+  if(AntRadioStatusChannel(ANT_CHANNEL_USERAPP) == ANT_OPEN)
+  {
+    UserApp1_StateMachine = UserApp1SM_Mode3;
   }
 }
 
@@ -266,17 +309,22 @@ static void UserApp1SM_ChannelOpening(void)
 
 
 
-static void UserApp1SM_RadioActive(void)
+static void UserApp1SM_Mode1(void)
 {
   static u8 au8CurrentMessage[4]={0,0,0,0};
-  static u8 u8Heartrate=0;
+  static u8 u8Heartrate=50;
   static u8 au8Show[20]={'H','e','a','r','t','R','a','t','e',':','0','0','0'};
+  static bool bBlink=FALSE;
+  static bool bBuzzerOn=FALSE;
   
   if(WasButtonPressed(BUTTON0))
   {
     ButtonAcknowledge(BUTTON0);
     AntCloseChannelNumber(ANT_CHANNEL_USERAPP);
     UserApp1_StateMachine = UserApp1SM_Idle;
+    LCDCommand(LCD_CLEAR_CMD);
+    LCDMessage(LINE1_START_ADDR, "B1 Normal B2 LoseWei");
+    LCDMessage(LINE2_START_ADDR, "B3 Find Device");
   }
   
   if( AntReadAppMessageBuffer() )
@@ -295,8 +343,286 @@ static void UserApp1SM_RadioActive(void)
       
     }
   }
+  if(u8Heartrate<50)
+  {
+    PWMAudioOn(BUZZER1);
+  }
+  else
+  {
+    PWMAudioOff(BUZZER1);
+  }
+  
+  if(u8Heartrate>50&&u8Heartrate<60)
+  {
+    LedOn(ORANGE);
+    LedOff(RED);
+    LedOff(PURPLE);
+    LedOff(CYAN);
+    LedOff(YELLOW);
+    LedOff(BLUE);
+    LedOff(GREEN);
+    LedOff(WHITE);
+    bBlink=FALSE;
+  }
+  if(u8Heartrate>60&&u8Heartrate<70)
+  {
+    LedOn(ORANGE);
+    LedOn(RED);
+    LedOff(PURPLE);
+    LedOff(CYAN);
+    LedOff(YELLOW);
+    LedOff(BLUE);
+    LedOff(GREEN);
+    LedOff(WHITE);
+    bBlink=FALSE;
+  }
+  if(u8Heartrate>70&&u8Heartrate<80)
+  {
+    LedOn(ORANGE);
+    LedOn(RED);
+    LedOn(PURPLE);
+    LedOff(CYAN);
+    LedOff(YELLOW);
+    LedOff(BLUE);
+    LedOff(GREEN);
+    LedOff(WHITE);
+    bBlink=FALSE;
+  }
+  if(u8Heartrate>80&&u8Heartrate<90)
+  {
+    LedOn(ORANGE);
+    LedOn(RED);
+    LedOn(PURPLE);
+    LedOn(CYAN);
+    LedOff(YELLOW);
+    LedOff(BLUE);
+    LedOff(GREEN);
+    LedOff(WHITE);
+    bBlink=FALSE;
+  }
+  if(u8Heartrate>90&&u8Heartrate<100)
+  {
+    LedOn(ORANGE);
+    LedOn(RED);
+    LedOn(PURPLE);
+    LedOn(CYAN);
+    LedOn(YELLOW);
+    LedOff(BLUE);
+    LedOff(GREEN);
+    LedOff(WHITE);
+    bBlink=FALSE;
+  }
+  if(u8Heartrate>100&&u8Heartrate<110)
+  {
+    LedOn(ORANGE);
+    LedOn(RED);
+    LedOn(PURPLE);
+    LedOn(CYAN);
+    LedOn(YELLOW);
+    LedOn(BLUE);
+    LedOff(GREEN);
+    LedOff(WHITE);
+    bBlink=FALSE;
+  }
+  if(u8Heartrate>110&&u8Heartrate<120)
+  {
+    LedOn(ORANGE);
+    LedOn(RED);
+    LedOn(PURPLE);
+    LedOn(CYAN);
+    LedOn(YELLOW);
+    LedOn(BLUE);
+    LedOn(GREEN);
+    LedOff(WHITE);
+    bBlink=FALSE;
+  }
+  if(u8Heartrate>120&&u8Heartrate<130)
+  {
+    LedOn(ORANGE);
+    LedOn(RED);
+    LedOn(PURPLE);
+    LedOn(CYAN);
+    LedOn(YELLOW);
+    LedOn(BLUE);
+    LedOn(GREEN);
+    LedOn(WHITE);
+    bBlink=FALSE;
+  }
+  if(u8Heartrate>130&&!bBlink)
+  {
+    LedOff(ORANGE);
+    LedOff(RED);
+    LedOff(PURPLE);
+    LedOff(CYAN);
+    LedOff(YELLOW);
+    LedOff(BLUE);
+    LedOff(GREEN);
+    LedOff(WHITE);
+    LedBlink(ORANGE,LED_2HZ);
+    LedBlink(RED,LED_2HZ);
+    LedBlink(PURPLE,LED_2HZ);
+    LedBlink(CYAN,LED_2HZ);
+    LedBlink(YELLOW,LED_2HZ);
+    LedBlink(BLUE,LED_2HZ);
+    LedBlink(GREEN,LED_2HZ);
+    LedBlink(WHITE,LED_2HZ);
+    bBlink=TRUE;
+  }
+
+  
+  
 }
 
+static void UserApp1SM_Mode2(void)
+{
+
+  static u8 u8Age=0;
+
+  static u8 au8HRMemory[100];
+  static u16 u16Counterdown=10000;
+  static u8 u8Counter=0;
+  static u8 u8StaticHeartRate=0;
+  static u32 u32store=0;
+  static u8 u8MaxLoseWeightHR=0;
+  static u8 u8MinLoseWeightHR=0;  
+  static u8 u8Heartrate=0;
+  static u8 au8Show[20]={'H','e','a','r','t','R','a','t','e',':','0','0','0'};
+  static u8 au8Show2[20]={'A','p','p','r','o','p','r','i','a','t','e','0','0','0','-','0','0','0'};
+  static bool bNotShown=TRUE;
+  static u8 au8CurrentMessage[4]={0,0,0,0};
+  
+  if(WasButtonPressed(BUTTON0))
+  {
+    ButtonAcknowledge(BUTTON0);
+    AntCloseChannelNumber(ANT_CHANNEL_USERAPP);
+    UserApp1_StateMachine = UserApp1SM_Idle;
+    LCDCommand(LCD_CLEAR_CMD);
+    LCDMessage(LINE1_START_ADDR, "B1 Normal B2 LoseWei");
+    LCDMessage(LINE2_START_ADDR, "B3 Find Device");
+  }
+  
+  if(!bInitialize)
+  {
+    LCDMessage(LINE1_START_ADDR, "B1 15-25 B2 25-35");
+    LCDMessage(LINE2_START_ADDR, "B3 35-45");
+    bInitialize=TRUE;
+    bNotShown=TRUE;
+  }
+  if(WasButtonPressed(BUTTON1))
+  {
+    ButtonAcknowledge(BUTTON1);
+    u8Age=20;
+    u8ChangeFlag=1;
+    LCDCommand(LCD_CLEAR_CMD);
+  }
+  if(WasButtonPressed(BUTTON2))
+  {
+    ButtonAcknowledge(BUTTON2);
+    u8Age=30;
+    u8ChangeFlag=1;
+    LCDCommand(LCD_CLEAR_CMD);
+  }
+  if(WasButtonPressed(BUTTON3))
+  {
+    ButtonAcknowledge(BUTTON3);
+    u8Age=40;
+    u8ChangeFlag=1;
+    LCDCommand(LCD_CLEAR_CMD);
+  }
+  
+  if(u8ChangeFlag==1)
+  {
+    u16Counterdown--;
+    if( AntReadAppMessageBuffer() )
+    {
+      if(G_eAntApiCurrentMessageClass == ANT_DATA)
+      {
+        for(u8 u8i=0;u8i<4;u8i++)
+        {
+          au8CurrentMessage[u8i]=G_au8AntApiCurrentMessageBytes[u8i+4];
+        }
+        u8Heartrate=au8CurrentMessage[3];
+        au8Show[10]=u8Heartrate/100+48;
+        au8Show[11]=(u8Heartrate%100)/10+48;
+        au8Show[12]=(u8Heartrate%100)%10+48;
+        LCDMessage(LINE1_START_ADDR,au8Show);
+        
+        au8HRMemory[u8Counter]=G_au8AntApiCurrentMessageBytes[7];
+        u8Counter++;
+      }
+    }
+    if(u16Counterdown==0)
+    {
+      u8ChangeFlag=2;
+      LCDCommand(LCD_CLEAR_CMD);
+    }
+  }
+  
+  if(u8ChangeFlag==2)
+  {
+    u16Counterdown=10000;
+    for(u8 u8j=0;u8j<u8Counter;u8j++)
+    {
+      u32store+=au8HRMemory[u8j];
+    }
+    u8StaticHeartRate=u32store/u8Counter;
+    u8ChangeFlag=3;
+  }
+  
+  if(u8ChangeFlag==3)
+  {
+    u8Counter=0;
+    u8MaxLoseWeightHR=((220-u8Age-u8StaticHeartRate) * 0.85)+u8StaticHeartRate;
+    u8MinLoseWeightHR=((220-u8Age-u8StaticHeartRate) * 0.65)+u8StaticHeartRate;
+    au8Show2[11]=u8MinLoseWeightHR/100+48;
+    au8Show2[12]=(u8MinLoseWeightHR%100)/10+48;
+    au8Show2[13]=(u8MinLoseWeightHR%100)%10+48;
+    au8Show2[15]=u8MaxLoseWeightHR/100+48;
+    au8Show2[16]=(u8MaxLoseWeightHR%100)/10+48;
+    au8Show2[17]=(u8MaxLoseWeightHR%100)%10+48;
+    
+    if(bNotShown)
+    {
+      LCDMessage(LINE2_START_ADDR,au8Show2);
+      bNotShown=FALSE;
+    }
+    
+    if( AntReadAppMessageBuffer() )
+    {
+      if(G_eAntApiCurrentMessageClass == ANT_DATA)
+      {
+        for(u8 u8i=0;u8i<4;u8i++)
+        {
+          au8CurrentMessage[u8i]=G_au8AntApiCurrentMessageBytes[u8i+4];
+        }
+        u8Heartrate=au8CurrentMessage[3];
+        au8Show[10]=u8Heartrate/100+48;
+        au8Show[11]=(u8Heartrate%100)/10+48;
+        au8Show[12]=(u8Heartrate%100)%10+48;
+        LCDMessage(LINE1_START_ADDR,au8Show);
+        
+        au8HRMemory[u8Counter]=G_au8AntApiCurrentMessageBytes[7];
+        u8Counter++;
+      }
+    }   
+ 
+  }
+}
+
+static void UserApp1SM_Mode3(void)
+{
+  if(WasButtonPressed(BUTTON0))
+  {
+    ButtonAcknowledge(BUTTON0);
+    AntCloseChannelNumber(ANT_CHANNEL_USERAPP);
+    UserApp1_StateMachine = UserApp1SM_Idle;
+    LCDCommand(LCD_CLEAR_CMD);
+    LCDMessage(LINE1_START_ADDR, "B1 Normal B2 LoseWei");
+    LCDMessage(LINE2_START_ADDR, "B3 Find Device");
+  }
+  
+  
+}
 /*-------------------------------------------------------------------------------------------------------------------*/
 /* Handle an error */
 static void UserApp1SM_Error(void)          

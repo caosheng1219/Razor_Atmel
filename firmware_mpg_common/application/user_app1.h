@@ -73,10 +73,14 @@ State Machine Declarations
 static void UserApp1SM_WaitChannelAssign(void);
 static void UserApp1SM_Idle(void);
 static void UserApp1SM_WaitChannelClose(void);
-static void UserApp1SM_ChannelOpening(void);
+static void UserApp1SM_ChannelOpening1(void);
+static void UserApp1SM_ChannelOpening2(void);
+static void UserApp1SM_ChannelOpening3(void);
 static void UserApp1SM_Error(void);         
 static void UserApp1SM_FailedInit(void);        
-static void UserApp1SM_RadioActive(void);
+static void UserApp1SM_Mode3(void);
+static void UserApp1SM_Mode2(void);
+static void UserApp1SM_Mode1(void);
 #endif /* __USER_APP_H */
 
 
