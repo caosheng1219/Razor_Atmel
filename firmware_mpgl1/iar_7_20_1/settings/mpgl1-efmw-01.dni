@@ -9,7 +9,7 @@ TriggerName=main
 LimitSize=0
 ByteLimit=50
 [DebugChecksum]
-Checksum=-1699025418
+Checksum=1502542409
 [JLinkDriver]
 CStepIntDis=_ 0
 WatchCond=_ 0
@@ -66,7 +66,8 @@ Fmt8={W}3:u8Heartrate	3	0
 Fmt9={W}3:u8MaxLoseWeightHR	3	0
 Fmt10={W}3:u8MinLoseWeightHR	3	0
 Fmt11={W}3:u8StaticHeartRate	3	0
-Fmt12={W}3:u8store	3	0
+Fmt12={W}3:u8Temp	3	0
+Fmt13={W}3:u8store	3	0
 [Log file]
 LoggingEnabled=_ 0
 LogFile=_ ""
@@ -86,7 +87,7 @@ Exclusions=
 mode=0
 [Breakpoints2]
 Bp0=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\application\mpgl1_board_test.c}.382.5" 0 0 1 "" 0 "" 0
-Bp1=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\..\firmware_mpg_common\application\user_app1.c}.640.1" 0 0 1 "" 0 "" 0
+Bp1=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\..\firmware_mpg_common\application\user_app1.c}.792.1" 0 0 1 "" 0 "" 0
 Count=2
 [Aliases]
 Count=0

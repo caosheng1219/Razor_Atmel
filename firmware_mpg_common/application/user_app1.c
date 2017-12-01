@@ -315,7 +315,7 @@ static void UserApp1SM_Mode1(void)
   static u8 u8Heartrate=50;
   static u8 au8Show[20]={'H','e','a','r','t','R','a','t','e',':','0','0','0'};
   static bool bBlink=FALSE;
-  static bool bBuzzerOn=FALSE;
+
   
   if(WasButtonPressed(BUTTON0))
   {
@@ -325,6 +325,14 @@ static void UserApp1SM_Mode1(void)
     LCDCommand(LCD_CLEAR_CMD);
     LCDMessage(LINE1_START_ADDR, "B1 Normal B2 LoseWei");
     LCDMessage(LINE2_START_ADDR, "B3 Find Device");
+    LedOff(ORANGE);
+    LedOff(RED);
+    LedOff(PURPLE);
+    LedOff(CYAN);
+    LedOff(YELLOW);
+    LedOff(BLUE);
+    LedOff(GREEN);
+    LedOff(WHITE);
   }
   
   if( AntReadAppMessageBuffer() )
@@ -499,6 +507,14 @@ static void UserApp1SM_Mode2(void)
     LCDCommand(LCD_CLEAR_CMD);
     LCDMessage(LINE1_START_ADDR, "B1 Normal B2 LoseWei");
     LCDMessage(LINE2_START_ADDR, "B3 Find Device");
+    LedOff(ORANGE);
+    LedOff(RED);
+    LedOff(PURPLE);
+    LedOff(CYAN);
+    LedOff(YELLOW);
+    LedOff(BLUE);
+    LedOff(GREEN);
+    LedOff(WHITE);
   }
   
   if(!bInitialize)
@@ -611,6 +627,12 @@ static void UserApp1SM_Mode2(void)
 
 static void UserApp1SM_Mode3(void)
 {
+  static s8 s8RssiChannel0=-99;
+  static u8 au8Temp[]={'R','S','S','I','=','-',1,1,'d','B','m','\0'};
+  static u8 u8Temp;
+
+
+  
   if(WasButtonPressed(BUTTON0))
   {
     ButtonAcknowledge(BUTTON0);
@@ -619,9 +641,139 @@ static void UserApp1SM_Mode3(void)
     LCDCommand(LCD_CLEAR_CMD);
     LCDMessage(LINE1_START_ADDR, "B1 Normal B2 LoseWei");
     LCDMessage(LINE2_START_ADDR, "B3 Find Device");
+    LedOff(ORANGE);
+    LedOff(RED);
+    LedOff(PURPLE);
+    LedOff(CYAN);
+    LedOff(YELLOW);
+    LedOff(BLUE);
+    LedOff(GREEN);
+    LedOff(WHITE);
   }
   
-  
+  if( AntReadAppMessageBuffer() )
+    {
+      /* New data message: check what it is */
+      if(G_eAntApiCurrentMessageClass == ANT_DATA)
+      {
+        if(G_sAntApiCurrentMessageExtData.u8Channel == 0x00)
+        {
+          s8RssiChannel0 = G_sAntApiCurrentMessageExtData.s8RSSI;
+
+        }
+      }
+       
+
+
+      u8Temp = abs(s8RssiChannel0);
+      au8Temp[6] = u8Temp/10 + 48;
+      au8Temp[7] = u8Temp%10 + 48;
+      LCDMessage(LINE1_END_ADDR-20, au8Temp);
+    
+
+      if(s8RssiChannel0>-120&&s8RssiChannel0<-110)
+      {
+        LedOn(ORANGE);
+        LedOff(RED);
+        LedOff(PURPLE);
+        LedOff(CYAN);
+        LedOff(RED);
+        LedOff(BLUE);
+        LedOff(GREEN);
+        LedOff(WHITE);
+      }
+      if(s8RssiChannel0>-110&&s8RssiChannel0<-100)
+      {
+        LedOn(ORANGE);
+        LedOn(RED);
+        LedOff(PURPLE);
+        LedOff(CYAN);
+        LedOff(RED);
+        LedOff(BLUE);
+        LedOff(GREEN);
+        LedOff(WHITE);
+      }
+      if(s8RssiChannel0>-100&&s8RssiChannel0<-90)
+      {
+        LedOn(ORANGE);
+        LedOn(RED);
+        LedOn(PURPLE);
+        LedOff(CYAN);
+        LedOff(RED);
+        LedOff(BLUE);
+        LedOff(GREEN);
+        LedOff(WHITE);
+      }
+      if(s8RssiChannel0>-90&&s8RssiChannel0<-80)
+      {
+        LedOn(ORANGE);
+        LedOn(RED);
+        LedOn(PURPLE);
+        LedOn(CYAN);
+        LedOff(RED);
+        LedOff(BLUE);
+        LedOff(GREEN);
+        LedOff(WHITE);
+      }
+      if(s8RssiChannel0>-80&&s8RssiChannel0<-70)
+      {
+        LedOn(ORANGE);
+        LedOn(RED);
+        LedOn(PURPLE);
+        LedOn(CYAN);
+        LedOn(RED);
+        LedOff(BLUE);
+        LedOff(GREEN);
+        LedOff(WHITE);
+      }
+      if(s8RssiChannel0>-70&&s8RssiChannel0<-65)
+      {
+        LedOn(ORANGE);
+        LedOn(RED);
+        LedOn(PURPLE);
+        LedOn(CYAN);
+        LedOn(RED);
+        LedOn(BLUE);
+        LedOff(GREEN);
+        LedOff(WHITE);
+      }
+      if(s8RssiChannel0>-65&&s8RssiChannel0<-60)
+      {
+        LedOn(ORANGE);
+        LedOn(RED);
+        LedOn(PURPLE);
+        LedOn(CYAN);
+        LedOn(RED);
+        LedOn(BLUE);
+        LedOn(GREEN);
+        LedOff(WHITE);
+      }
+      if(s8RssiChannel0>-60&&s8RssiChannel0<-55)
+      {
+        LedOn(ORANGE);
+        LedOn(RED);
+        LedOn(PURPLE);
+        LedOn(CYAN);
+        LedOn(RED);
+        LedOn(BLUE);
+        LedOn(GREEN);
+        LedOn(WHITE);
+        
+      }
+      if(s8RssiChannel0>=-50)
+      {
+        LedOff(ORANGE);
+        LedOff(RED);
+        LedOff(PURPLE);
+        LedOff(CYAN);
+        LedOff(RED);
+        LedOff(BLUE);
+        LedOff(GREEN);
+        LedOff(WHITE);
+        s8RssiChannel0=-99;
+      }
+    }
+
 }
 /*-------------------------------------------------------------------------------------------------------------------*/
 /* Handle an error */
