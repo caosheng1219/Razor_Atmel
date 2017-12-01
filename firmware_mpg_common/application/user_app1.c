@@ -498,6 +498,9 @@ static void UserApp1SM_Mode2(void)
   static u8 au8Show2[20]={'A','p','p','r','o','p','r','i','a','t','e','0','0','0','-','0','0','0'};
   static bool bNotShown=TRUE;
   static u8 au8CurrentMessage[4]={0,0,0,0};
+  static u8 au8AgeMessage[20]={'B','U','T','T','O','N','1',' ','G','O',' ','O','N',' ','0',' ',' ',' ',' ','0'};
+  static u8 u8AgeHi[1];
+  static u8 u8AgeLo[1];
   
   if(WasButtonPressed(BUTTON0))
   {
@@ -518,32 +521,49 @@ static void UserApp1SM_Mode2(void)
   }
   
   if(!bInitialize)
-  {
-    LCDMessage(LINE1_START_ADDR, "B1 15-25 B2 25-35");
-    LCDMessage(LINE2_START_ADDR, "B3 35-45");
+  {    
+    au8AgeMessage[14]=0;
+    au8AgeMessage[19]=0;
+    u8AgeLo[0]=0;
+    u8AgeHi[0]=0;
+    LCDMessage(LINE1_START_ADDR, "SET YOUR AGE");
+    LCDMessage(LINE2_START_ADDR, au8AgeMessage);
     bInitialize=TRUE;
     bNotShown=TRUE;
+
   }
   if(WasButtonPressed(BUTTON1))
   {
     ButtonAcknowledge(BUTTON1);
-    u8Age=20;
     u8ChangeFlag=1;
     LCDCommand(LCD_CLEAR_CMD);
+    u8Age=u8AgeHi[0]*10+u8AgeLo[0];
   }
   if(WasButtonPressed(BUTTON2))
   {
     ButtonAcknowledge(BUTTON2);
-    u8Age=30;
-    u8ChangeFlag=1;
+    u8AgeHi[0]=u8AgeHi[0]+1;
+    if(u8AgeHi[0]>9)
+    {
+      u8AgeHi[0]=u8AgeHi[0]-10;
+    }
+    au8AgeMessage[14]=u8AgeHi[0]+48;
     LCDCommand(LCD_CLEAR_CMD);
+    LCDMessage(LINE1_START_ADDR, "SET YOUR AGE");
+    LCDMessage(LINE2_START_ADDR, au8AgeMessage);
   }
   if(WasButtonPressed(BUTTON3))
   {
     ButtonAcknowledge(BUTTON3);
-    u8Age=40;
-    u8ChangeFlag=1;
+    u8AgeLo[0]=u8AgeLo[0]+1;
+    if(u8AgeLo[0]>9)
+    {
+      u8AgeLo[0]=u8AgeLo[0]-10;
+    }
+    au8AgeMessage[19]=u8AgeLo[0]+48;
     LCDCommand(LCD_CLEAR_CMD);
+    LCDMessage(LINE1_START_ADDR, "SET YOUR AGE");
+    LCDMessage(LINE2_START_ADDR, au8AgeMessage);
   }
   
   if(u8ChangeFlag==1)
