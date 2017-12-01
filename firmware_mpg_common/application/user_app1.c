@@ -522,8 +522,8 @@ static void UserApp1SM_Mode2(void)
   
   if(!bInitialize)
   {    
-    au8AgeMessage[14]=0;
-    au8AgeMessage[19]=0;
+    au8AgeMessage[14]=48;
+    au8AgeMessage[19]=48;
     u8AgeLo[0]=0;
     u8AgeHi[0]=0;
     LCDMessage(LINE1_START_ADDR, "SET YOUR AGE");
