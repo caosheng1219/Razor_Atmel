@@ -362,98 +362,98 @@ static void UserApp1SM_Mode1(void)
   
   if(u8Heartrate>50&&u8Heartrate<60)
   {
-    LedOn(ORANGE);
-    LedOff(RED);
+    LedOn(WHITE);
     LedOff(PURPLE);
-    LedOff(CYAN);
-    LedOff(YELLOW);
     LedOff(BLUE);
+    LedOff(CYAN);
     LedOff(GREEN);
-    LedOff(WHITE);
+    LedOff(YELLOW);
+    LedOff(ORANGE);
+    LedOff(RED);
     bBlink=FALSE;
   }
   if(u8Heartrate>60&&u8Heartrate<70)
   {
-    LedOn(ORANGE);
-    LedOn(RED);
-    LedOff(PURPLE);
-    LedOff(CYAN);
-    LedOff(YELLOW);
+    LedOn(WHITE);
+    LedOn(PURPLE);
     LedOff(BLUE);
+    LedOff(CYAN);
     LedOff(GREEN);
-    LedOff(WHITE);
+    LedOff(YELLOW);
+    LedOff(ORANGE);
+    LedOff(RED);
     bBlink=FALSE;
   }
   if(u8Heartrate>70&&u8Heartrate<80)
   {
-    LedOn(ORANGE);
-    LedOn(RED);
+    LedOn(WHITE);
     LedOn(PURPLE);
+    LedOn(BLUE);
     LedOff(CYAN);
-    LedOff(YELLOW);
-    LedOff(BLUE);
     LedOff(GREEN);
-    LedOff(WHITE);
+    LedOff(YELLOW);
+    LedOff(ORANGE);
+    LedOff(RED);
     bBlink=FALSE;
   }
   if(u8Heartrate>80&&u8Heartrate<90)
   {
-    LedOn(ORANGE);
-    LedOn(RED);
+    LedOn(WHITE);
     LedOn(PURPLE);
+    LedOn(BLUE);
     LedOn(CYAN);
-    LedOff(YELLOW);
-    LedOff(BLUE);
     LedOff(GREEN);
-    LedOff(WHITE);
+    LedOff(YELLOW);
+    LedOff(ORANGE);
+    LedOff(RED);
     bBlink=FALSE;
   }
   if(u8Heartrate>90&&u8Heartrate<100)
   {
-    LedOn(ORANGE);
-    LedOn(RED);
+    LedOn(WHITE);
     LedOn(PURPLE);
+    LedOn(BLUE);
     LedOn(CYAN);
-    LedOn(YELLOW);
-    LedOff(BLUE);
-    LedOff(GREEN);
-    LedOff(WHITE);
+    LedOn(GREEN);
+    LedOff(YELLOW);
+    LedOff(ORANGE);
+    LedOff(RED);
     bBlink=FALSE;
   }
   if(u8Heartrate>100&&u8Heartrate<110)
   {
-    LedOn(ORANGE);
-    LedOn(RED);
+    LedOn(WHITE);
     LedOn(PURPLE);
-    LedOn(CYAN);
-    LedOn(YELLOW);
     LedOn(BLUE);
-    LedOff(GREEN);
-    LedOff(WHITE);
+    LedOn(CYAN);
+    LedOn(GREEN);
+    LedOn(YELLOW);
+    LedOff(ORANGE);
+    LedOff(RED);
     bBlink=FALSE;
   }
   if(u8Heartrate>110&&u8Heartrate<120)
   {
-    LedOn(ORANGE);
-    LedOn(RED);
+    LedOn(WHITE);
     LedOn(PURPLE);
-    LedOn(CYAN);
-    LedOn(YELLOW);
     LedOn(BLUE);
+    LedOn(CYAN);
     LedOn(GREEN);
-    LedOff(WHITE);
+    LedOn(YELLOW);
+    LedOn(ORANGE);
+    LedOff(RED);
     bBlink=FALSE;
   }
   if(u8Heartrate>120&&u8Heartrate<130)
   {
+    LedOn(WHITE);
+    LedOn(PURPLE);
+    LedOn(BLUE);
+    LedOn(CYAN);
+    LedOn(GREEN);
+    LedOn(YELLOW);
     LedOn(ORANGE);
     LedOn(RED);
-    LedOn(PURPLE);
-    LedOn(CYAN);
-    LedOn(YELLOW);
-    LedOn(BLUE);
-    LedOn(GREEN);
-    LedOn(WHITE);
     bBlink=FALSE;
   }
   if(u8Heartrate>130&&!bBlink)
