@@ -608,8 +608,8 @@ static void UserApp1SM_Mode2(void)
   if(u8ChangeFlag==3)
   {
     u8Counter=0;
-    u8MaxLoseWeightHR=((220-u8Age-u8StaticHeartRate) * 0.85)+u8StaticHeartRate;
-    u8MinLoseWeightHR=((220-u8Age-u8StaticHeartRate) * 0.65)+u8StaticHeartRate;
+    u8MaxLoseWeightHR=((160-u8Age-u8StaticHeartRate) * 0.85)+u8StaticHeartRate;
+    u8MinLoseWeightHR=((160-u8Age-u8StaticHeartRate) * 0.65)+u8StaticHeartRate;
     au8Show2[11]=u8MinLoseWeightHR/100+48;
     au8Show2[12]=(u8MinLoseWeightHR%100)/10+48;
     au8Show2[13]=(u8MinLoseWeightHR%100)%10+48;
@@ -693,103 +693,103 @@ static void UserApp1SM_Mode3(void)
 
       if(s8RssiChannel0>-120&&s8RssiChannel0<-110)
       {
-        LedOn(ORANGE);
-        LedOff(RED);
-        LedOff(PURPLE);
-        LedOff(CYAN);
-        LedOff(RED);
-        LedOff(BLUE);
-        LedOff(GREEN);
         LedOff(WHITE);
+        LedOff(PURPLE);
+        LedOff(BLUE);
+        LedOff(CYAN);
+        LedOff(GREEN);
+        LedOff(YELLOW);
+        LedOff(ORANGE);
+        LedOff(RED);
       }
       if(s8RssiChannel0>-110&&s8RssiChannel0<-100)
       {
-        LedOn(ORANGE);
-        LedOn(RED);
+        LedOn(WHITE);
         LedOff(PURPLE);
-        LedOff(CYAN);
-        LedOff(RED);
         LedOff(BLUE);
+        LedOff(CYAN);
         LedOff(GREEN);
-        LedOff(WHITE);
+        LedOff(YELLOW);
+        LedOff(ORANGE);
+        LedOff(RED);
       }
       if(s8RssiChannel0>-100&&s8RssiChannel0<-90)
       {
-        LedOn(ORANGE);
-        LedOn(RED);
+        LedOn(WHITE);
         LedOn(PURPLE);
-        LedOff(CYAN);
-        LedOff(RED);
         LedOff(BLUE);
+        LedOff(CYAN);
         LedOff(GREEN);
-        LedOff(WHITE);
+        LedOff(YELLOW);
+        LedOff(ORANGE);
+        LedOff(RED);
       }
       if(s8RssiChannel0>-90&&s8RssiChannel0<-80)
       {
-        LedOn(ORANGE);
-        LedOn(RED);
+        LedOn(WHITE);
         LedOn(PURPLE);
-        LedOn(CYAN);
-        LedOff(RED);
-        LedOff(BLUE);
+        LedOn(BLUE);
+        LedOff(CYAN);
         LedOff(GREEN);
-        LedOff(WHITE);
+        LedOff(YELLOW);
+        LedOff(ORANGE);
+        LedOff(RED);
       }
       if(s8RssiChannel0>-80&&s8RssiChannel0<-70)
       {
-        LedOn(ORANGE);
-        LedOn(RED);
+        LedOn(WHITE);
         LedOn(PURPLE);
+        LedOn(BLUE);
         LedOn(CYAN);
-        LedOn(RED);
-        LedOff(BLUE);
         LedOff(GREEN);
-        LedOff(WHITE);
+        LedOff(YELLOW);
+        LedOff(ORANGE);
+        LedOff(RED);
       }
       if(s8RssiChannel0>-70&&s8RssiChannel0<-65)
       {
-        LedOn(ORANGE);
-        LedOn(RED);
+        LedOn(WHITE);
         LedOn(PURPLE);
-        LedOn(CYAN);
-        LedOn(RED);
         LedOn(BLUE);
-        LedOff(GREEN);
-        LedOff(WHITE);
+        LedOn(CYAN);
+        LedOn(GREEN);
+        LedOff(YELLOW);
+        LedOff(ORANGE);
+        LedOff(RED);
       }
       if(s8RssiChannel0>-65&&s8RssiChannel0<-60)
       {
-        LedOn(ORANGE);
-        LedOn(RED);
+        LedOn(WHITE);
         LedOn(PURPLE);
-        LedOn(CYAN);
-        LedOn(RED);
         LedOn(BLUE);
+        LedOn(CYAN);
         LedOn(GREEN);
-        LedOff(WHITE);
+        LedOn(YELLOW);
+        LedOff(ORANGE);
+        LedOff(RED);
       }
       if(s8RssiChannel0>-60&&s8RssiChannel0<-55)
       {
-        LedOn(ORANGE);
-        LedOn(RED);
-        LedOn(PURPLE);
-        LedOn(CYAN);
-        LedOn(RED);
-        LedOn(BLUE);
-        LedOn(GREEN);
         LedOn(WHITE);
+        LedOn(PURPLE);
+        LedOn(BLUE);
+        LedOn(CYAN);
+        LedOn(GREEN);
+        LedOn(YELLOW);
+        LedOn(ORANGE);
+        LedOff(RED);
         
       }
       if(s8RssiChannel0>=-50)
       {
-        LedOff(ORANGE);
-        LedOff(RED);
-        LedOff(PURPLE);
-        LedOff(CYAN);
-        LedOff(RED);
-        LedOff(BLUE);
-        LedOff(GREEN);
-        LedOff(WHITE);
+        LedOn(WHITE);
+        LedOn(PURPLE);
+        LedOn(BLUE);
+        LedOn(CYAN);
+        LedOn(GREEN);
+        LedOn(YELLOW);
+        LedOn(ORANGE);
+        LedOn(RED);
         s8RssiChannel0=-99;
       }
     }
