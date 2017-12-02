@@ -226,6 +226,7 @@ static void UserApp1SM_WaitChannelAssign(void)
 */
 static void UserApp1SM_Idle(void)
 {
+  PWMAudioOff(BUZZER1);
   bInitialize=FALSE;
   u8ChangeFlag=0;
   if(WasButtonPressed(BUTTON1))
